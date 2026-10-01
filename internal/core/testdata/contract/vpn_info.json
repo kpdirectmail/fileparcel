@@ -1,0 +1,19 @@
+{
+  "id": "tailscale",
+  "kind": "tailscale",
+  "label": "Tailscale",
+  "role": "mesh",
+  "role_source": "auto",
+  "interfaces": [
+    "tailscale0"
+  ],
+  "ranges": [
+    "100.64.0.0/10",
+    "fd7a:115c:a1e0::/48"
+  ],
+  "allowed": "partly",
+  "can_allow": true,
+  "needs_force": false,
+  "recommended": true,
+  "warning": "shared with NetBird, NordVPN Meshnet, Cloudflare WARP and ISP carrier-grade NAT"
+}

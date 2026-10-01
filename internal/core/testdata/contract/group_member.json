@@ -1,0 +1,17 @@
+{
+  "group_id": "grp_01k5z8r3m9d4q7w2x6c1v0b5nd",
+  "user_id": "usr_01k5z8r3m9d4q7w2x6c1v0b5nb",
+  "username": "alice",
+  "display_name": "Alice",
+  "role": "manager",
+  "added_at": "2026-09-24T10:00:00Z",
+  "direct": true,
+  "direct_role": "member",
+  "via_roles": [
+    {
+      "id": "rol_01k5z8r3m9d4q7w2x6c1v0b5np",
+      "name": "Finance",
+      "member_role": "manager"
+    }
+  ]
+}

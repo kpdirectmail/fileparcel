@@ -1,0 +1,12 @@
+#!/bin/sh
+# FileParcel post-commit hook (DESIGN §15): builds releases/fileparcel-vN.zip and
+# tags vN for every commit. Enable with:  git config core.hooksPath .githooks
+# (or: make hooks). Skip once with:       FILEPARCEL_NO_RELEASE=1 git commit …
+# Build in the background with:           FILEPARCEL_RELEASE_ASYNC=1
+[ -n "$FILEPARCEL_NO_RELEASE" ] && exit 0
+[ -n "$FILEPARCEL_RELEASING" ] && exit 0
+gd=$(git rev-parse --git-dir)
+{ [ -d "$gd/rebase-merge" ] || [ -d "$gd/rebase-apply" ] || [ -f "$gd/CHERRY_PICK_HEAD" ]; } && exit 0
+top=$(git rev-parse --show-toplevel) || exit 0
+[ -f "$top/scripts/release.sh" ] || exit 0
+FILEPARCEL_RELEASING=1 exec sh "$top/scripts/release.sh" --from-hook

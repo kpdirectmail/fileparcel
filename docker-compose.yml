@@ -1,0 +1,64 @@
+# FileParcel with Docker Compose (DESIGN §14.7). Quick start (Linux):
+#
+#   mkdir -p fileparcel-data && sudo chown 65532:65532 fileparcel-data   # the container runs as uid 65532
+#   mkdir -m 700 secrets                            # only you can enter it ...
+#   openssl rand -base64 18 > secrets/fp_admin_password.txt
+#   chmod 644 secrets/fp_admin_password.txt         # ... while uid 65532 can read the bind-mounted file
+#   docker compose up -d --build
+#   docker compose logs fileparcel                  # access URLs, CA fingerprint
+#
+# Then open https://<this-host>:8443/ and log in as "admin" with the password from
+# secrets/fp_admin_password.txt (change it after the first login). Admin commands run
+# inside the container, e.g.:  docker compose exec fileparcel fileparcel status
+# More in docs/INSTALL.md, section "Run FileParcel in Docker".
+
+name: fileparcel
+
+services:
+  fileparcel:
+    build:
+      context: .
+      args:
+        VERSION: ${FILEPARCEL_VERSION:-dev}
+        COMMIT: ${FILEPARCEL_COMMIT:-unknown}
+    image: fileparcel:${FILEPARCEL_VERSION:-dev}
+    container_name: fileparcel
+    # Host networking gives FileParcel the real client IPs (for the access
+    # allowlist and the audit log) and lets it publish fileparcel.local via mDNS.
+    # Docker Desktop (macOS/Windows) has no host networking: remove this line and
+    # uncomment "ports" below (then the allowlist sees Docker's gateway address;
+    # use "fileparcel network mode private" or allow that address).
+    network_mode: host
+    # ports:
+    #   - "8443:8443"
+    #   - "8080:8080"
+    environment:
+      FILEPARCEL_ADMIN_USER: admin
+      FILEPARCEL_ADMIN_PASSWORD_FILE: /run/secrets/fp_admin_password
+      # Any bootstrap setting can be overridden: FILEPARCEL_<SECTION>_<KEY>
+      # FILEPARCEL_SERVER_HTTPS_PORT: "8443"
+      # FILEPARCEL_SERVER_HTTP_PORT: "8080"
+      # FILEPARCEL_SERVER_NAME: fileparcel
+      # FILEPARCEL_LOG_LEVEL: info
+    volumes:
+      - ./fileparcel-data:/data
+      # Optional: publish fileparcel.local through the host's Avahi daemon (Linux).
+      # - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+      # Optional: fetch *.ts.net certificates from the host's tailscaled (the
+      # container's uid 65532 must be allowed: sudo tailscale set --operator=...).
+      # - /var/run/tailscale/tailscaled.sock:/var/run/tailscale/tailscaled.sock
+    secrets:
+      - fp_admin_password
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - "no-new-privileges:true"
+    restart: unless-stopped
+    stop_grace_period: 40s
+
+secrets:
+  fp_admin_password:
+    file: ./secrets/fp_admin_password.txt

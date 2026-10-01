@@ -1,0 +1,25 @@
+FileParcel install plan (dry run: nothing will be changed)
+
+  Install directory:  /ROOT/opt
+  Version:            v7 abc1234 2026-09-19
+  Binary:             /ROOT/release/bin/fileparcel-linux-amd64 -> /ROOT/opt/bin/fileparcel
+  Service:            systemd system service, start at boot: yes, runs as fileparcel
+  Ports:              HTTPS 443, HTTP redirect 80
+  Server name:        fileparcel.local
+  Admin:              admin, password generated (shown once, must be changed at the first sign-in)
+  Master key:         plain key file (unlocked automatically)
+  Network access:     allowlist (loopback + detected private LAN/Wi-Fi subnets, tailnet and VPN ranges)
+
+Steps:
+   1. Create the service account fileparcel (if missing)
+   2. Initialise /ROOT/opt: layout, master key, local CA and certificates, network policy, owner admin, backup identity
+        fileparcel.toml, data/, keys/master.key, certs/ (CA, client CA, leaf), owner account, backup identity
+   3. Install the binary and support files
+        /ROOT/opt/bin/fileparcel (0755), /ROOT/opt/VERSION
+        /ROOT/release/uninstall.sh -> /ROOT/opt/uninstall.sh
+        /ROOT/release/docs/ -> /ROOT/opt/docs/
+   4. Give /ROOT/opt to fileparcel (bin/ stays owned by root)
+   5. Register the systemd system service, enable it at boot and start it
+        registration: /ROOT/etc-systemd/fileparcel.service
+   6. Record the installation in /ROOT/opt/service/installed.json
+   7. Check https://127.0.0.1:443/healthz (up to 1s)

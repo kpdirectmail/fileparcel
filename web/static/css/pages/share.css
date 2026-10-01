@@ -1,0 +1,292 @@
+/* Public share viewer & file-request drop zone (/s/:token). Owned by J2; @layer pages. */
+
+.share-page {
+  display: grid;
+  gap: var(--fp-space-5);
+  width: min(1100px, 100%);
+  min-width: 0;
+}
+.share-page--request { width: min(760px, 100%); }
+.share-card { width: min(880px, 100%); }
+
+/* ---- hero ---- */
+.share-hero { gap: var(--fp-space-4); }
+.share-hero-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--fp-space-3) var(--fp-space-4);
+  align-items: center;
+}
+.share-hero-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--fp-accent-kraft-soft);
+  color: var(--fp-accent-kraft-text);
+}
+.share-hero-icon .icon { width: 28px; height: 28px; stroke-width: 1.75; }
+.share-hero-text { display: grid; gap: var(--fp-space-1); min-width: 0; }
+.share-hero-text h1 { font-size: var(--fp-text-xl); overflow-wrap: anywhere; outline: none; }
+.share-meta { display: flex; flex-wrap: wrap; gap: 2px var(--fp-space-2); color: var(--fp-text-muted); font-size: var(--fp-text-sm); }
+.share-meta strong { color: var(--fp-text); }
+/* Each separator rides with the entry it precedes (one flex item), so a wrap never leaves a dangling "·"
+   at the end of a line; the margin reproduces the gap the container used to put after the separator. */
+.share-meta-item { min-width: 0; }
+.share-meta-sep { color: var(--fp-text-subtle); margin-inline-end: var(--fp-space-2); }
+.share-hero-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: var(--fp-space-2); }
+@media (min-width: 720px) {
+  .share-hero-main { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .share-hero-actions { grid-column: auto; justify-content: flex-end; }
+}
+
+/* ---- single file ---- */
+.share-single { gap: var(--fp-space-4); }
+.share-single-file {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--fp-space-3) var(--fp-space-4);
+  align-items: center;
+}
+.share-single-file > .btn { grid-column: 1 / -1; justify-self: start; }
+@media (min-width: 640px) {
+  .share-single-file { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .share-single-file > .btn { grid-column: auto; }
+}
+.share-file-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: var(--fp-radius);
+  background: var(--fp-surface-2);
+  color: var(--fp-text-muted);
+}
+.share-single-thumb {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-sunken);
+  overflow: hidden;
+  cursor: zoom-in;
+}
+.share-single-thumb img { display: block; width: 100%; max-height: 60vh; object-fit: contain; }
+
+/* ---- folder browser ---- */
+.share-browser { display: grid; gap: var(--fp-space-3); min-width: 0; }
+.share-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--fp-space-2); min-width: 0; }
+.share-crumbs { min-width: 0; flex: 1; }
+.share-view-toggle { flex: none; gap: 2px; }
+.share-selbar {
+  position: sticky;
+  inset-block-start: var(--fp-space-2);
+  z-index: var(--fp-z-sticky);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fp-space-2);
+  padding: var(--fp-space-2) var(--fp-space-3) var(--fp-space-2) var(--fp-space-4);
+  border-radius: var(--fp-radius);
+  background: var(--fp-primary-soft-2);
+  color: var(--fp-primary-text);
+  box-shadow: var(--fp-shadow-1);
+}
+.share-selbar[hidden] { display: none; }
+.share-list-slot[aria-busy="true"] { opacity: 0.6; transition: opacity var(--fp-dur) var(--fp-ease); }
+
+.share-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-lg);
+  background: var(--fp-surface);
+  overflow: hidden;
+}
+.share-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: var(--fp-row-h);
+  padding-inline-end: var(--fp-space-2);
+  border-block-end: 1px solid var(--fp-border);
+}
+.share-row:last-child { border-block-end: 0; }
+.share-row:hover { background: color-mix(in oklch, var(--fp-surface-2) 70%, transparent); }
+.share-row[data-selected] { background: var(--fp-primary-soft); }
+.share-row:not(:has(.share-check)) { grid-template-columns: minmax(0, 1fr) auto; padding-inline-start: var(--fp-space-2); }
+.share-check { width: 48px; }
+.share-row-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--fp-space-3);
+  min-height: var(--fp-row-h);
+  min-width: 0;
+  padding: 0 var(--fp-space-2);
+  color: var(--fp-text);
+  text-align: start;
+  font-size: var(--fp-text-sm);
+  border-radius: var(--fp-radius-sm);
+}
+.share-row-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: var(--fp-weight-medium); }
+.share-row-meta { color: var(--fp-text-muted); font-size: var(--fp-text-xs); white-space: nowrap; font-variant-numeric: tabular-nums; min-width: 4.5em; text-align: end; }
+.share-row-pad { display: block; width: var(--fp-touch); }
+.share-item-icon { display: grid; place-items: center; width: 32px; height: 32px; color: var(--fp-text-muted); }
+.share-item-icon[data-kind="folder"] { color: var(--fp-accent-kraft); }
+.share-item-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: var(--fp-radius-sm); background: var(--fp-surface-2); }
+@media (max-width: 639px) {
+  /* phones: the name gets the whole width and the size goes under it (as in the app's file list), so similar long
+     names ("holiday-photo-1 …", "…-2") stay tell-apart-able at 320 px */
+  .share-row-main { grid-template-columns: auto minmax(0, 1fr); column-gap: var(--fp-space-3); row-gap: 0; padding-block: var(--fp-space-1); }
+  .share-row-main > .share-item-icon, .share-row-main > .share-item-thumb { grid-row: 1 / span 2; }
+  .share-row-main > .share-row-name { grid-column: 2; }
+  .share-row-main > .share-row-meta { grid-column: 2; min-width: 0; text-align: start; }
+}
+
+.share-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(150px, 44%), 1fr));
+  gap: var(--fp-space-3);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.share-tile {
+  position: relative;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-lg);
+  background: var(--fp-surface);
+  overflow: hidden;
+  transition: border-color var(--fp-dur-fast) var(--fp-ease), box-shadow var(--fp-dur-fast) var(--fp-ease);
+}
+.share-tile:hover { border-color: var(--fp-border-strong); box-shadow: var(--fp-shadow-1); }
+.share-tile[data-selected] { border-color: var(--fp-primary); box-shadow: 0 0 0 2px var(--fp-primary-soft-2); }
+.share-tile-main { display: grid; width: 100%; gap: 2px; padding: 0 0 var(--fp-space-3); text-align: start; color: var(--fp-text); }
+.share-tile-visual {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 3;
+  margin-block-end: var(--fp-space-2);
+  background: var(--fp-surface-2);
+  overflow: hidden;
+}
+.share-tile-visual .share-item-thumb { width: 100%; height: 100%; border-radius: 0; }
+.share-tile-visual .share-item-icon { width: 48px; height: 48px; }
+.share-tile-visual .share-item-icon .icon { width: 36px; height: 36px; stroke-width: 1.5; }
+.share-tile-name { padding-inline: var(--fp-space-3); font-size: var(--fp-text-sm); font-weight: var(--fp-weight-medium); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share-tile-meta { padding-inline: var(--fp-space-3); font-size: var(--fp-text-xs); color: var(--fp-text-muted); }
+.share-tile .share-check {
+  position: absolute;
+  inset-block-start: 4px;
+  inset-inline-start: 4px;
+  width: var(--fp-touch);
+  border-radius: var(--fp-radius);
+  background: color-mix(in oklch, var(--fp-surface) 85%, transparent);
+}
+.share-more { display: flex; justify-content: center; min-height: var(--fp-space-2); }
+
+/* ---- preview overlay ---- */
+.share-preview { --dialog-w: 1100px; }
+.share-preview .dialog-body { gap: var(--fp-space-3); }
+.share-preview-stage {
+  display: grid;
+  place-items: center;
+  gap: var(--fp-space-2);
+  min-height: 200px;
+  max-height: 72dvh;
+  overflow: auto;
+  border-radius: var(--fp-radius);
+  background: var(--fp-sunken);
+}
+.share-preview-media { max-width: 100%; max-height: 70dvh; object-fit: contain; }
+.share-preview-audio { display: grid; justify-items: center; gap: var(--fp-space-4); padding: var(--fp-space-8) var(--fp-space-4); color: var(--fp-text-muted); width: 100%; }
+.share-preview-audio audio { width: min(480px, 100%); }
+.share-preview-frame { width: 100%; height: 70dvh; border: 0; background: var(--fp-surface); }
+.share-preview-text {
+  width: 100%;
+  max-height: 70dvh;
+  margin: 0;
+  overflow: auto;
+  border: 0;
+  border-radius: 0;
+  font-size: var(--fp-text-xs);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  align-self: stretch;
+}
+.share-preview-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--fp-space-2); }
+.share-preview-bar [hidden] { display: none !important; }
+
+/* ---- file request ---- */
+.share-request { gap: var(--fp-space-4); }
+.share-drop {
+  display: grid;
+  justify-items: center;
+  gap: var(--fp-space-3);
+  padding: var(--fp-space-8) var(--fp-space-4);
+  border: 2px dashed var(--fp-border-strong);
+  border-radius: var(--fp-radius-lg);
+  text-align: center;
+  background: var(--fp-surface-2);
+  transition: border-color var(--fp-dur-fast) var(--fp-ease), background-color var(--fp-dur-fast) var(--fp-ease);
+}
+.share-drop[hidden] { display: none; }
+.share-drop[data-over] { border-color: var(--fp-primary); background: var(--fp-primary-soft); }
+.share-drop > .icon { width: 44px; height: 44px; color: var(--fp-primary); stroke-width: 1.5; }
+.share-drop-title { font-size: var(--fp-text-md); }
+.share-drop-actions { justify-content: center; }
+
+.share-upload-list {
+  display: grid;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  max-height: 360px;
+  overflow-y: auto;
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+}
+.share-upload-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: var(--fp-space-1) var(--fp-space-3);
+  min-height: var(--fp-touch);
+  padding: var(--fp-space-1) var(--fp-space-2) var(--fp-space-1) var(--fp-space-3);
+  border-block-end: 1px solid var(--fp-border);
+  font-size: var(--fp-text-sm);
+}
+.share-upload-item:last-child { border-block-end: 0; }
+.share-upload-item > .icon { color: var(--fp-text-muted); }
+.share-upload-item--progress { grid-template-columns: auto minmax(0, 1fr) auto; padding-block: var(--fp-space-2); }
+.share-upload-item--progress > .progress { grid-column: 2 / -1; }
+@media (max-width: 639px) {
+  /* the picked files on phones: the size under the name, the remove button at the end of the row */
+  .share-upload-item:not(.share-upload-item--progress) { grid-template-columns: auto minmax(0, 1fr) auto; row-gap: 0; }
+  .share-upload-item:not(.share-upload-item--progress) > .icon { grid-row: 1 / span 2; }
+  .share-upload-item:not(.share-upload-item--progress) > .share-upload-name { grid-column: 2; grid-row: 1; }
+  .share-upload-item:not(.share-upload-item--progress) > .share-upload-meta { grid-column: 2; grid-row: 2; }
+  .share-upload-item:not(.share-upload-item--progress) > .icon-btn { grid-column: 3; grid-row: 1 / span 2; }
+}
+.share-upload-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share-upload-meta { font-size: var(--fp-text-xs); color: var(--fp-text-muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.share-upload-item[data-state="failed"] .share-upload-meta,
+.share-upload-item[data-state="failed"] > .icon { color: var(--fp-danger-text); }
+.share-upload-item[data-state="done"] .share-upload-meta { color: var(--fp-success-text); }
+
+.share-thanks { display: grid; justify-items: center; gap: var(--fp-space-3); padding: var(--fp-space-6) 0; text-align: center; }
+.share-thanks .share-upload-list { width: 100%; text-align: start; }
+.share-thanks-icon { color: var(--fp-success); }
+.share-thanks:has(.share-upload-list) .share-thanks-icon { color: var(--fp-warning); }
+.share-thanks-icon .icon { width: 48px; height: 48px; stroke-width: 1.5; }
+
+/* Scoped to the public request card: the app's file-request dialog (share-dialog.js) also puts .share-limits on its
+   grid of limit fields (files.css), whose inputs must keep the form's font size and gap. */
+.share-request .share-limits { display: grid; gap: var(--fp-space-2); padding: 0; margin: 0; list-style: none; font-size: var(--fp-text-sm); color: var(--fp-text-muted); }
+.share-request .share-limits li { display: flex; align-items: flex-start; gap: var(--fp-space-2); }
+.share-request .share-limits .icon { margin-block-start: 2px; flex: none; }

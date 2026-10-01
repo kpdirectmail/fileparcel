@@ -1,0 +1,6 @@
+{
+  "id": "tailscale.userspace",
+  "severity": "warn",
+  "message": "Tailscale runs without a TUN device: tailnet connections reach FileParcel from 127.0.0.1 and bypass the access policy.",
+  "hint": "run tailscaled with a TUN device, or use Serve (fileparcel network tailscale-serve enable)"
+}

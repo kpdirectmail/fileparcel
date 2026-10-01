@@ -1,0 +1,46 @@
+{
+  "items": [
+    {
+      "name": "shares.links",
+      "group": "sharing",
+      "label": "Create share links",
+      "description": "Create public links to files and folders they manage (only while share links are enabled in Settings → Sharing).",
+      "server": false,
+      "high_impact": false
+    },
+    {
+      "name": "users.manage",
+      "group": "people",
+      "label": "Manage accounts",
+      "description": "Create, edit, disable, enable, unlock and delete accounts and give them roles: Member, Guest and the roles an administrator allows — never accounts or roles with server permissions this role does not have.",
+      "server": true,
+      "high_impact": true,
+      "warning": "Can delete accounts together with their personal files, and create accounts with a password they choose.",
+      "implies": [
+        "users.view"
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "id": "sharing",
+      "label": "Sharing & account"
+    },
+    {
+      "id": "people",
+      "label": "People"
+    },
+    {
+      "id": "content",
+      "label": "Content"
+    },
+    {
+      "id": "server",
+      "label": "Server"
+    },
+    {
+      "id": "monitoring",
+      "label": "Monitoring"
+    }
+  ]
+}

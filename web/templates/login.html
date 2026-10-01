@@ -1,0 +1,49 @@
+{{/*
+  login.html — /login — password → TOTP/recovery step, passkey sign-in.
+  Rendered by internal/web/pages with html/template. Data fields:
+    .Title (page title without instance name; may be empty) .Page (page id) .Instance (ui.instance_name)
+    .Asset ("/static/<buildhash>", no trailing slash) .Theme ("light"|"dark"|"system") .Lang (BCP 47, e.g. "en")
+    .Boot (Go value; JSON-encoded by html/template inside the application/json script — see js/app.js for the keys).
+  CSP: no inline scripts/styles/handlers here. The #fp-boot block is data (type=application/json), never executed.
+*/ -}}
+<!doctype html>
+<html lang="{{.Lang}}" data-theme="{{.Theme}}" data-page="{{.Page}}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="{{if eq .Theme "dark"}}#101419{{else}}#fbf9f5{{end}}" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="{{if eq .Theme "light"}}#fbf9f5{{else}}#101419{{end}}" media="(prefers-color-scheme: dark)">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow">
+<meta name="format-detection" content="telephone=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="{{.Instance}}">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<title>{{if .Title}}{{.Title}} · {{end}}{{.Instance}}</title>
+<link rel="icon" href="{{.Asset}}/icons/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="{{.Asset}}/icons/app-apple-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="stylesheet" href="{{.Asset}}/css/app.css">
+<link rel="stylesheet" href="/theme.css">
+<link rel="modulepreload" href="{{.Asset}}/js/core/dom.js">
+<link rel="modulepreload" href="{{.Asset}}/js/core/api.js">
+<link rel="modulepreload" href="{{.Asset}}/js/public/common.js">
+<link rel="modulepreload" href="{{.Asset}}/js/public/login.js">
+<script type="application/json" id="fp-boot">{{.Boot}}</script>
+<script type="module" src="{{.Asset}}/js/public/login.js"></script>
+</head>
+<body>
+<div class="public-shell">
+  <header class="public-header">
+    <a class="brand" href="/"><img class="brand-logo" src="{{.Asset}}/icons/logo.svg" alt="" width="32" height="32"><span class="brand-name">{{.Instance}}</span></a>
+    <div id="fp-header-actions" class="cluster"></div>
+  </header>
+  <main id="fp-root" class="public-main" tabindex="-1">
+    <div class="loading-block" data-loading><span class="spinner spinner--lg" role="status" aria-label="Loading"></span></div>
+    <noscript><div class="auth-card"><h1>Sign in</h1><p>Please enable JavaScript to sign in.</p></div></noscript>
+  </main>
+  <footer class="public-footer">Powered by FileParcel</footer>
+</div>
+</body>
+</html>

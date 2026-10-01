@@ -1,0 +1,17 @@
+{
+  "id": "gnt_01k5z8r3m9d4q7w2x6c1v0b5nk",
+  "node_id": "nod_01k5z8r3m9d4q7w2x6c1v0b5nh",
+  "subject_type": "role",
+  "subject_id": "rol_01k5z8r3m9d4q7w2x6c1v0b5np",
+  "subject_name": "Finance",
+  "role": "manager",
+  "created_by": "usr_01k5z8r3m9d4q7w2x6c1v0b5nc",
+  "created_at": "2026-09-24T10:00:00Z",
+  "expires_at": "2026-10-01T10:00:00Z",
+  "node_name": "Reports",
+  "node_path": "/Company/Reports",
+  "node_kind": "folder",
+  "space_kind": "group",
+  "space_name": "Company",
+  "caller_perm": "manage"
+}

@@ -1,0 +1,16 @@
+{
+  "folder_id": "nod_01k5z8r3m9d4q7w2x6c1v0b5nh",
+  "mode": "zip",
+  "zip_name": "Trip",
+  "conflict": "rename",
+  "files": [
+    {
+      "client_ref": "c1",
+      "rel_path": "Trip/a.jpg",
+      "size": 1024,
+      "mtime": 1790000000000
+    }
+  ],
+  "zip_encryption": "aes256",
+  "zip_password": "correct horse battery"
+}

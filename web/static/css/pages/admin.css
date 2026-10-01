@@ -1,0 +1,576 @@
+/* Admin pages (js/pages/admin/**). Owned by J2; @layer pages. Mobile-first: everything stacks at 320 px, tables
+ * scroll inside .table-wrap, touch targets use --fp-touch. Shared list/choice/secret styles live in settings.css. */
+
+.admin-grid { display: grid; gap: var(--fp-space-4); grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr)); }
+
+/* ---- toolbars (search + filters) ---- */
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fp-space-2) var(--fp-space-3);
+  margin-block-end: var(--fp-space-4);
+}
+.admin-toolbar > .field, .admin-toolbar > .toggle { margin: 0; }
+.admin-toolbar .field { min-width: 0; }
+.admin-toolbar select { width: auto; max-width: 100%; }
+.admin-toolbar-search { flex: 1 1 240px; min-width: min(240px, 100%); }
+.admin-toolbar .toggle { gap: var(--fp-space-2); }
+@media (max-width: 639px) {
+  .admin-toolbar > .field, .admin-toolbar-search { flex: 1 1 100%; }
+  .admin-toolbar select { width: 100%; }
+}
+.admin-toolbar--wrap { row-gap: var(--fp-space-3); }
+
+.load-more { display: flex; justify-content: center; padding-block: var(--fp-space-2); }
+.load-more:empty { display: none; }
+
+/* table cells */
+.row-link { color: inherit; text-decoration: none; display: grid; min-width: 0; }
+.row-link:hover .user-cell-name, .row-link:hover strong { text-decoration: underline; text-underline-offset: 0.2em; }
+/* Touch: the row itself activates (table.js sets tabindex + onRowClick, cells are 56 px), but the link in
+   the identity cell must clear 44 px on its own (§13.5). min-height, not height: a name that wraps to two
+   lines stays taller. Covers /admin/users, /admin/groups and the /admin/groups/{id} member list. */
+@media (pointer: coarse) {
+  .row-link { min-height: var(--fp-touch); align-content: center; }
+}
+/* The identity column carries the row's meaning, so it gets a floor: its name and sub-line are
+   nowrap + ellipsis inside min-width:0 boxes, so auto table layout would otherwise shrink the column to the
+   avatar while the nowrap badge columns keep their full width. A narrow table scrolls inside .table-wrap.
+   Must be a plain length (a percentage resolves cyclically in a table cell and is ignored), and must stay
+   scoped to table cells: the user picker and its chosen-user row use .user-cell shrink-wrapped. */
+.table td .user-cell { min-width: 9rem; }
+.switch-cell { justify-content: flex-start; }
+
+/* ---- user cell / avatar ---- */
+.user-cell { display: inline-flex; align-items: center; gap: var(--fp-space-3); min-width: 0; max-width: 100%; }
+.user-cell-text { display: grid; min-width: 0; }
+.user-cell-name { font-weight: var(--fp-weight-semibold); color: var(--fp-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-cell-sub { font-size: var(--fp-text-xs); color: var(--fp-text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-cell-sub-sep { color: var(--fp-text-subtle); margin-inline: 0.4em 0.35em; }
+/* Phones render only User + Status + Actions (Role and "Last sign-in" are .hide-sm), so the identity column
+   cannot both keep its 9rem floor and fit "@user · email" on one line: below the sm breakpoint it stacks and
+   wraps instead of ellipsing. Scoped to table cells — the user picker still shrink-wraps on one line.
+   The sub-line becomes a wrapping flex row so each separator stays glued to the entry it introduces and
+   never dangles at a line end (same treatment as .share-meta on the public share page). */
+@media (max-width: 639px) {
+  .table td .user-cell { min-width: 0; align-items: flex-start; }
+  .table td .user-cell-name,
+  .table td .user-cell-sub,
+  .table td .user-cell-sub-item {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+  /* A display name breaks at its own boundaries first (spaces, hyphens) and only mid-word when a single
+     word cannot fit; usernames and e-mail addresses have none, so they may break anywhere. */
+  .table td .user-cell-name { overflow-wrap: break-word; }
+  .table td .user-cell-sub, .table td .user-cell-sub-item { overflow-wrap: anywhere; }
+  .table td .user-cell-sub { display: flex; flex-wrap: wrap; }
+  .table td .user-cell-sub-item { min-width: 0; }
+  .table td .row-link { padding-block: var(--fp-space-2); }
+}
+
+/* ---- chips (SANs, CIDRs, addresses) ---- */
+.chip-list { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; padding: 0; margin: 0; }
+.chip {
+  display: inline-block;
+  max-width: 100%;
+  padding: 1px 8px;
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-surface-2);
+  border: 1px solid var(--fp-border);
+  font-family: var(--fp-font-mono);
+  font-size: var(--fp-text-xs);
+  overflow-wrap: anywhere;
+}
+.chip--more { font-family: var(--fp-font); color: var(--fp-text-muted); }
+
+/* ---- form helpers ---- */
+.check-grid { display: grid; gap: var(--fp-space-1) var(--fp-space-4); grid-template-columns: repeat(auto-fill, minmax(min(180px, 100%), 1fr)); }
+.quota-field { display: grid; gap: var(--fp-space-2); }
+.cron-field { display: grid; gap: var(--fp-space-2); }
+.grid-keep { display: grid; gap: var(--fp-space-3); grid-template-columns: repeat(auto-fit, minmax(min(140px, 100%), 1fr)); }
+
+/* user picker (combobox) */
+.picker { position: relative; }
+.picker-list {
+  display: grid;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 4px;
+  margin: 0;
+  list-style: none;
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius);
+  background: var(--fp-surface);
+  box-shadow: var(--fp-shadow-2);
+}
+.picker-option {
+  display: flex;
+  align-items: center;
+  min-height: var(--fp-touch);
+  padding: 4px var(--fp-space-2);
+  border-radius: var(--fp-radius-sm);
+  cursor: pointer;
+}
+.picker-option:hover, .picker-option[aria-selected="true"] { background: var(--fp-primary-soft); }
+.picker-empty { padding: var(--fp-space-2) var(--fp-space-3); color: var(--fp-text-muted); font-size: var(--fp-text-sm); }
+.picker-chosen {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fp-space-2);
+  padding: var(--fp-space-2) var(--fp-space-3);
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-surface-2);
+}
+
+/* ---- dashboard ---- */
+.admin-tiles {
+  display: grid;
+  gap: var(--fp-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(210px, 100%), 1fr));
+  margin-block: var(--fp-space-4);
+}
+.admin-tiles .stat-value { font-size: var(--fp-text-xl); }
+.admin-tiles .stat-hint { overflow-wrap: anywhere; }
+.admin-dash-cols { display: grid; gap: var(--fp-space-4); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 1024px) {
+  .admin-dash-cols { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+
+.activity-list, .health-list { display: grid; list-style: none; padding: 0; margin: 0; }
+.activity-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-3);
+  align-items: start;
+  padding-block: var(--fp-space-2);
+  border-block-end: 1px solid var(--fp-border);
+  font-size: var(--fp-text-sm);
+}
+.activity-row:last-child { border-block-end: 0; }
+.activity-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--fp-radius-sm); background: var(--fp-surface-2); color: var(--fp-text-muted); }
+.activity-icon .icon { width: 16px; height: 16px; }
+.activity-row[data-outcome="failure"] .activity-icon, .activity-row[data-outcome="denied"] .activity-icon { background: var(--fp-danger-soft); color: var(--fp-danger-text); }
+.activity-text { min-width: 0; overflow-wrap: anywhere; padding-block-start: 3px; }
+.activity-target { color: var(--fp-text-muted); }
+.activity-time { font-size: var(--fp-text-xs); color: var(--fp-text-subtle); white-space: nowrap; padding-block-start: 4px; }
+
+.health-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-3);
+  align-items: center;
+  padding-block: var(--fp-space-2);
+  border-block-end: 1px solid var(--fp-border);
+}
+.health-row:last-child { border-block-end: 0; }
+.health-icon { display: grid; place-items: center; }
+.health-row[data-status="ok"] .health-icon { color: var(--fp-success-text); }
+.health-row[data-status="warn"] .health-icon { color: var(--fp-warning-text); }
+.health-row[data-status="fail"] .health-icon { color: var(--fp-danger-text); }
+.health-row[data-status="info"] .health-icon { color: var(--fp-info-text); }
+.health-text { display: grid; gap: 2px; min-width: 0; font-size: var(--fp-text-sm); }
+.health-name { font-weight: var(--fp-weight-semibold); }
+.health-msg { color: var(--fp-text-muted); overflow-wrap: anywhere; }
+.health-hint { color: var(--fp-text); font-size: var(--fp-text-xs); overflow-wrap: anywhere; }
+@media (max-width: 479px) {
+  .health-row { grid-template-columns: auto minmax(0, 1fr); }
+  .health-row > .btn { grid-column: 2; justify-self: start; }
+}
+
+/* ---- danger zone ---- */
+.danger-zone { border-color: color-mix(in oklch, var(--fp-danger) 40%, var(--fp-border)); }
+.danger-zone > .card-title { color: var(--fp-danger-text); }
+.danger-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--fp-space-3);
+  padding-block-start: var(--fp-space-3);
+  border-block-start: 1px solid var(--fp-border);
+}
+.danger-row > div { flex: 1 1 260px; min-width: 0; }
+
+/* ---- invite / QR dialogs ---- */
+.invite-qr { display: flex; justify-content: center; }
+.invite-link .badge { white-space: normal; }
+
+/* ---- network ---- */
+.url-list, .iface-list { display: grid; list-style: none; padding: 0; margin: 0; }
+.url-row, .iface-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-1) var(--fp-space-3);
+  align-items: center;
+  padding-block: var(--fp-space-3);
+  border-block-end: 1px solid var(--fp-border);
+}
+.iface-row { grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+.url-row:last-child, .iface-row:last-child { border-block-end: 0; }
+.url-row-icon, .iface-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--fp-radius); background: var(--fp-surface-2); color: var(--fp-text-muted); }
+.iface-row:not([data-up]) { opacity: 0.65; }
+.url-row-main, .iface-main { display: grid; gap: 4px; min-width: 0; }
+.url-row-link { font-size: var(--fp-text-sm); overflow-wrap: anywhere; }
+/* Touch: an inline 20 px address link is below the §13.5 floor; give it a real 44 px hit area on coarse
+   pointers only, so the desktop .url-row keeps its height. */
+@media (pointer: coarse) {
+  .url-row-link { display: block; min-block-size: var(--fp-touch); align-content: center; }
+}
+.iface-title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fp-space-2); }
+.iface-group-title { font-size: var(--fp-text-sm); color: var(--fp-text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+@media (max-width: 479px) {
+  .url-row { grid-template-columns: auto minmax(0, 1fr); }
+  .url-row > .cluster { grid-column: 2; }
+}
+
+/* ---- audit ---- */
+.audit-range { display: flex; flex-wrap: wrap; gap: var(--fp-space-2); align-items: end; }
+.audit-range .field { flex: 1 1 180px; }
+.audit-list { display: grid; list-style: none; padding: 0; margin: 0; border: 1px solid var(--fp-border); border-radius: var(--fp-radius-lg); background: var(--fp-surface); overflow: hidden; }
+.audit-list:empty { display: none; }
+.audit-row + .audit-row { border-block-start: 1px solid var(--fp-border); }
+.audit-row-btn {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-3);
+  align-items: start;
+  width: 100%;
+  min-height: var(--fp-touch);
+  padding: var(--fp-space-3) var(--fp-space-4);
+  text-align: start;
+  font-size: var(--fp-text-sm);
+}
+.audit-row-btn:hover { background: var(--fp-surface-2); }
+.audit-icon { display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--fp-radius-sm); background: var(--fp-surface-2); color: var(--fp-text-muted); }
+.audit-icon .icon { width: 16px; height: 16px; }
+.audit-row[data-outcome="failure"] .audit-icon, .audit-row[data-outcome="denied"] .audit-icon { background: var(--fp-danger-soft); color: var(--fp-danger-text); }
+.audit-main { display: grid; gap: 2px; min-width: 0; }
+.audit-line { overflow-wrap: anywhere; }
+.audit-target { color: var(--fp-text-muted); }
+.audit-meta { display: flex; flex-wrap: wrap; gap: 2px var(--fp-space-3); font-size: var(--fp-text-xs); color: var(--fp-text-subtle); }
+.audit-action { font-size: 0.95em; }
+.audit-side { display: grid; justify-items: end; gap: 4px; font-size: var(--fp-text-xs); color: var(--fp-text-muted); white-space: nowrap; }
+.audit-sentinel { height: 1px; }
+@media (max-width: 479px) {
+  .audit-row-btn { grid-template-columns: auto minmax(0, 1fr); }
+  .audit-side { grid-column: 2; justify-items: start; }
+}
+
+/* ---- jobs ---- */
+.job-progress { display: grid; gap: var(--fp-space-1); }
+.job-progress[data-state="failed"] .progress { --fp-primary: var(--fp-danger); }
+.job-cell-progress { display: grid; gap: 2px; min-width: 120px; }
+
+/* ---- encryption ---- */
+.rotate-grid { display: grid; gap: var(--fp-space-3); grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+.rotate-item { display: grid; gap: var(--fp-space-2); align-content: start; padding: var(--fp-space-4); border: 1px solid var(--fp-border); border-radius: var(--fp-radius); background: var(--fp-surface-2); }
+.rotate-item p { margin: 0; }
+
+/* ---- system: log viewer ---- */
+.log-view {
+  margin: 0;
+  max-height: min(60vh, 560px);
+  min-height: 160px;
+  overflow: auto;
+  font-size: var(--fp-text-xs);
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  tab-size: 4;
+}
+.log-view.log-nowrap { white-space: pre; overflow-wrap: normal; }
+.log-line[data-level="warn"] { color: var(--fp-warning-text); }
+.log-line[data-level="error"] { color: var(--fp-danger-text); font-weight: var(--fp-weight-semibold); }
+.log-line[data-level="debug"] { color: var(--fp-text-subtle); }
+
+.restart-wait { justify-items: center; text-align: center; padding-block: var(--fp-space-4); }
+
+/* ---- admin settings: section nav + form ---- */
+.settings-layout { display: grid; gap: var(--fp-space-5); grid-template-columns: minmax(0, 1fr); align-items: start; }
+.settings-nav-list { display: none; list-style: none; padding: 0; margin: 0; }
+.settings-nav-select { width: 100%; }
+@media (min-width: 900px) {
+  .settings-layout { grid-template-columns: 220px minmax(0, 1fr); }
+  .settings-nav { position: sticky; top: calc(var(--fp-topbar-h) + var(--fp-space-4)); }
+  .settings-nav-list { display: grid; gap: 2px; }
+  .settings-nav-select { display: none; }
+}
+.settings-nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--fp-space-2);
+  min-height: var(--fp-touch);
+  padding: 0 var(--fp-space-3);
+  border-radius: var(--fp-radius-sm);
+  color: var(--fp-text-muted);
+  text-decoration: none;
+  font-size: var(--fp-text-sm);
+  font-weight: var(--fp-weight-medium);
+}
+.settings-nav-item:hover { background: var(--fp-surface-2); color: var(--fp-text); }
+.settings-nav-item[aria-current="page"] { background: var(--fp-primary-soft); color: var(--fp-primary-text); font-weight: var(--fp-weight-semibold); }
+.settings-main { min-width: 0; }
+/* the page shows its own restart banner (with a restart that waits for the server to come back) */
+.admin-settings .settings-section .app-banners { display: none !important; }
+
+/* ---- roles and permissions ---- */
+/* Admin → Roles, the role page (tabs: permissions, people, folders, groups), role pickers, permission chips,
+   "Your admin areas", the Access card of a user, the roles of a group and hidden invitation links
+   (js/pages/admin/{roles,role,common,dashboard,user,group,invites}.js). Phones: rows stack, the switch keeps a
+   44 px hit area, the save bar floats above the bottom tab bar. */
+
+/* role list */
+.table td .role-cell { min-width: 10rem; }
+.role-cell { gap: 2px; }
+.role-cell-title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fp-space-1) var(--fp-space-2); }
+.role-cell-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-size: var(--fp-text-xs);
+  color: var(--fp-text-muted);
+  overflow-wrap: anywhere;
+}
+.role-cell-sub { font-size: var(--fp-text-xs); color: var(--fp-text-muted); }
+.roles-how { margin-block-start: var(--fp-space-6); }
+
+/* role page */
+.role-panels { min-width: 0; }
+.role-panel { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--fp-space-4); min-width: 0; }
+.role-perm-summary { margin: 0; font-weight: var(--fp-weight-semibold); color: var(--fp-text-muted); }
+.tab-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--fp-space-2); }
+@media (max-width: 639px) {
+  .tab-actions > .btn { flex: 1 1 100%; }
+}
+@media (pointer: coarse) {
+  .role-people-link { display: inline-flex; align-items: center; min-height: var(--fp-touch); }
+}
+
+/* permission rows: label + description on the left, the switch top-right */
+.perm-list { display: grid; }
+.perm-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--fp-space-3);
+  align-items: start;
+  min-height: 44px;
+  padding-block: var(--fp-space-3);
+  border-block-start: 1px solid var(--fp-border);
+}
+.perm-row:first-child { border-block-start: 0; padding-block-start: 0; }
+.perm-row[aria-disabled="true"] .perm-label { color: var(--fp-text-muted); cursor: default; }
+.perm-text { display: grid; gap: 2px; min-width: 0; }
+.perm-label { font-weight: var(--fp-weight-semibold); display: flex; flex-wrap: wrap; gap: var(--fp-space-2); align-items: center; cursor: pointer; }
+.perm-desc, .perm-why { margin: 0; font-size: var(--fp-text-sm); color: var(--fp-text-muted); overflow-wrap: anywhere; }
+.perm-why { color: var(--fp-primary-text); }
+/* the switch's label is its 44 × 44 hit area; the negative margin lines the track up with the first text line */
+.perm-switch.toggle { display: grid; grid-template-columns: auto; place-items: center; min-width: 44px; min-height: 44px; margin-block: -9px; cursor: pointer; }
+.perm-row[aria-disabled="true"] .perm-switch { cursor: default; }
+.perm-row[aria-disabled="true"] input[role="switch"] { opacity: 0.6; cursor: default; }
+
+/* save bar: sticky at the bottom of the page while there are unsaved changes */
+.savebar {
+  position: sticky;
+  inset-block-end: max(var(--fp-space-4), env(safe-area-inset-bottom));
+  z-index: var(--fp-z-sticky);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--fp-space-2);
+  margin: var(--fp-space-4) auto 0;
+  padding: var(--fp-space-2) var(--fp-space-3);
+  border-radius: var(--fp-radius-lg);
+  background: var(--fp-surface);
+  border: 1px solid var(--fp-border);
+  box-shadow: var(--fp-shadow-3);
+  max-width: 100%;
+}
+.savebar-text { flex: 1 1 12rem; min-width: 0; font-size: var(--fp-text-sm); font-weight: var(--fp-weight-semibold); }
+.savebar-actions { display: flex; flex-wrap: wrap; gap: var(--fp-space-2); margin-inline-start: auto; }
+@media (max-width: 639px) {
+  .savebar { inset-block-end: calc(var(--fp-tabbar-h) + env(safe-area-inset-bottom) + var(--fp-space-2)); width: 100%; }
+}
+
+/* save confirmation */
+.role-change-title { margin: 0; font-size: var(--fp-text-sm); font-weight: var(--fp-weight-semibold); }
+.role-change-list { display: grid; gap: var(--fp-space-2); list-style: none; padding: 0; margin: 0; }
+.role-change { display: grid; gap: 2px; justify-items: start; }
+.role-change .badge { white-space: normal; }
+.role-change-warning { font-size: var(--fp-text-sm); color: var(--fp-warning-text); overflow-wrap: anywhere; }
+
+/* folders and groups of a role */
+.access-list { display: grid; gap: var(--fp-space-2); list-style: none; padding: 0; margin: 0; }
+.access-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-3);
+  align-items: center;
+  min-height: 44px;
+  padding: var(--fp-space-2) var(--fp-space-3);
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-surface);
+}
+.access-icon { display: grid; place-items: center; width: 36px; height: 36px; border-radius: var(--fp-radius); background: var(--fp-surface-2); color: var(--fp-text-muted); }
+.access-main { display: grid; gap: 2px; min-width: 0; }
+.access-name { font-weight: var(--fp-weight-semibold); overflow-wrap: anywhere; }
+a.access-name { color: inherit; text-decoration: none; }
+a.access-name:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.access-sub { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fp-space-1) var(--fp-space-2); font-size: var(--fp-text-xs); color: var(--fp-text-muted); overflow-wrap: anywhere; }
+.access-actions { display: flex; align-items: center; justify-content: flex-end; gap: var(--fp-space-2); }
+.access-level { width: auto; max-width: 100%; }
+.access-nomanage { display: grid; place-items: center; width: var(--fp-touch); height: var(--fp-touch); color: var(--fp-text-subtle); }
+@media (pointer: coarse) {
+  a.access-name { display: inline-flex; align-items: center; min-height: var(--fp-touch); }
+}
+@media (max-width: 479px) {
+  .access-row { grid-template-columns: auto minmax(0, 1fr); }
+  .access-row > .access-actions { grid-column: 1 / -1; }
+  .access-level { flex: 1 1 auto; }
+}
+
+/* the Access card of a user (js/pages/admin/user.js): what the account can reach, by source */
+.access-section { display: grid; gap: var(--fp-space-2); min-width: 0; }
+.access-section-title { margin: 0; font-size: var(--fp-text-sm); font-weight: var(--fp-weight-semibold); }
+.access-source { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--fp-space-1); }
+.access-actions--badges { flex-wrap: wrap; }
+@media (pointer: coarse) {
+  .access-source a { display: inline-flex; align-items: center; min-height: var(--fp-touch); min-width: var(--fp-touch); }
+}
+@media (max-width: 479px) {
+  .access-row > .access-actions--badges { justify-content: flex-start; }
+}
+
+/* links in a key/value list (who created an account, a role's page) are touch targets of their own on phones */
+@media (pointer: coarse) {
+  .kv dd a { display: inline-flex; align-items: center; min-height: var(--fp-touch); }
+}
+
+/* invitations whose link the caller may not see (js/pages/admin/invites.js) */
+.invite-link-hidden { display: inline-flex; align-items: center; gap: var(--fp-space-1); }
+.invite-link-hidden svg { flex: none; }
+
+/* role pickers and radio cards */
+.radio-cards { display: grid; gap: var(--fp-space-2); }
+.radio-card { min-height: 56px; }
+.role-help { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px var(--fp-space-2); min-width: 0; }
+/* a description with a long unbroken word (a handbook URL) wraps inside the field instead of widening the page or
+   the dialog (the roles list does the same with .role-cell-desc) */
+.role-help-text { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
+.role-help-link { font-weight: var(--fp-weight-medium); }
+@media (pointer: coarse) {
+  .role-help-link { display: inline-flex; align-items: center; min-height: var(--fp-touch); }
+}
+
+/* permission chips (grouped) */
+.perm-chips { display: grid; gap: var(--fp-space-2); }
+.perm-chip-group { display: grid; gap: 4px; }
+.perm-chip-group-label { font-size: var(--fp-text-xs); font-weight: var(--fp-weight-medium); color: var(--fp-text-muted); }
+.perm-chip-list { display: flex; flex-wrap: wrap; gap: 4px; list-style: none; padding: 0; margin: 0; }
+.perm-chip-list .badge { white-space: normal; }
+
+/* "Your admin areas" (dashboard for staff without "Server status") */
+.admin-areas {
+  display: grid;
+  gap: var(--fp-space-3);
+  grid-template-columns: repeat(auto-fill, minmax(min(260px, 100%), 1fr));
+  list-style: none;
+  padding: 0;
+  margin: var(--fp-space-4) 0 0;
+}
+.admin-area {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-3);
+  align-items: center;
+  min-height: 64px;
+  height: 100%;
+  padding: var(--fp-space-4);
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-lg);
+  background: var(--fp-surface);
+  box-shadow: var(--fp-shadow-1);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--fp-dur-fast) var(--fp-ease), box-shadow var(--fp-dur-fast) var(--fp-ease);
+}
+.admin-area:hover { border-color: var(--fp-border-strong); box-shadow: var(--fp-shadow-2); }
+.admin-area-icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: var(--fp-radius); background: var(--fp-primary-soft); color: var(--fp-primary-text); }
+.admin-area-text { display: grid; gap: 2px; min-width: 0; }
+.admin-area-label { font-weight: var(--fp-weight-semibold); }
+.admin-area-desc { font-size: var(--fp-text-sm); color: var(--fp-text-muted); overflow-wrap: anywhere; }
+.admin-area-go { color: var(--fp-text-subtle); }
+/* ---- end roles and permissions ---- */
+
+/* ---- remote access and VPNs ---- */
+/* Tailscale Funnel / Serve cards (pages/admin/network-remote.js) */
+.remote-title { display: flex; align-items: center; gap: var(--fp-space-2); min-width: 0; }
+.remote-title > span { min-width: 0; overflow-wrap: anywhere; }
+.remote-title > .icon { flex: none; color: var(--fp-text-muted); }
+.remote-address { display: flex; align-items: end; gap: var(--fp-space-2); min-width: 0; }
+.remote-address > .remote-url { flex: 1; min-width: 0; }
+.remote-url { overflow-wrap: anywhere; }
+.remote-warning { display: flex; align-items: flex-start; gap: var(--fp-space-1); color: var(--fp-warning-text); }
+.remote-warning > .icon { flex: none; margin-block-start: 2px; }
+.remote-subtitle { font-size: var(--fp-text-sm); font-weight: var(--fp-weight-semibold); }
+.remote-advanced > div { color: var(--fp-text); }
+.remote-connection { padding-block-start: var(--fp-space-2); border-block-start: 1px solid var(--fp-border); }
+.remote-connection .settings-section .form-actions { justify-content: flex-start; }
+.check-list.remote-checks { gap: 0; }
+.remote-check {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: var(--fp-space-1) var(--fp-space-2);
+  align-items: start;
+  padding: var(--fp-space-2);
+  border-block-end: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius-sm);
+}
+.remote-check:last-child { border-block-end: 0; }
+.remote-check-icon { display: grid; place-items: center; margin-block-start: 1px; }
+.remote-check[data-status="ok"] .remote-check-icon { color: var(--fp-success-text); }
+.remote-check[data-status="warn"] .remote-check-icon { color: var(--fp-warning-text); }
+.remote-check[data-status="fail"] .remote-check-icon { color: var(--fp-danger-text); }
+.remote-check[data-status="skip"] { color: var(--fp-text-subtle); }
+.remote-check[data-status="skip"] .remote-check-icon { color: var(--fp-text-subtle); }
+.remote-check[data-highlight] { background: var(--fp-danger-soft); outline: 2px solid var(--fp-danger); outline-offset: -2px; }
+.remote-check-text { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.remote-check-label { font-weight: var(--fp-weight-semibold); }
+.remote-check-msg { color: var(--fp-text-muted); }
+.remote-check-hint { font-size: var(--fp-text-xs); }
+.remote-check > .btn { align-self: center; }
+.remote-checks-ok > summary { gap: var(--fp-space-2); }
+.remote-checks-ok > summary > .icon { color: var(--fp-success-text); }
+.remote-checks-ok > div { padding-inline: var(--fp-space-2); }
+.remote-notes { display: grid; gap: var(--fp-space-2); font-size: var(--fp-text-xs); color: var(--fp-text-subtle); }
+.remote-notes > p { margin: 0; }
+.remote-foreign-list { display: grid; gap: var(--fp-space-2); list-style: none; padding: 0; margin: 0; }
+.remote-foreign-list > li { display: grid; gap: 4px; min-width: 0; }
+.remote-exposure { display: grid; gap: 2px; min-width: 0; overflow-wrap: anywhere; }
+.remote-exposure-hint { font-size: var(--fp-text-xs); }
+/* Interfaces grouped by role, with the role menu (pages/admin/network.js) */
+.iface-row[data-menu] { grid-template-columns: auto minmax(0, 1fr) auto; }
+.iface-row[data-menu] > .icon-btn { align-self: center; }
+.iface-main code, .vpn-notes code { overflow-wrap: anywhere; }
+.iface-group > .alert { margin: 0; }
+.vpn-notes { display: grid; gap: var(--fp-space-1); }
+.vpn-notes:empty { display: none; }
+.vpn-notes > p { margin: 0; overflow-wrap: anywhere; }
+@media (max-width: 639px) {
+  /* phones: a mode's "Recommended" badge goes under its name, the fix link under its check, and the card's buttons
+     share the width */
+  .remote-card .choice-card-head { flex-wrap: wrap; }
+  .remote-card .choice-card-label { flex: 1 1 calc(100% - 4rem); min-width: 0; }
+  .remote-card .choice-card-head > .badge { order: 1; margin-inline-start: calc(20px + var(--fp-space-2)); }
+  .remote-check { grid-template-columns: auto minmax(0, 1fr); }
+  .remote-check > .btn { grid-column: 2; justify-self: start; }
+  .remote-card .btn-row > .btn { flex: 1 1 auto; }
+}
+/* ---- end remote access and VPNs ---- */

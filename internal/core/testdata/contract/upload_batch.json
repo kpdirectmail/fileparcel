@@ -1,0 +1,19 @@
+{
+  "id": "upb_01k5z8r3m9d4q7w2x6c1v0b5nm",
+  "user_id": "usr_01k5z8r3m9d4q7w2x6c1v0b5nb",
+  "folder_id": "nod_01k5z8r3m9d4q7w2x6c1v0b5nh",
+  "mode": "zip",
+  "zip_name": "Trip",
+  "zip_encryption": "aes256",
+  "conflict": "rename",
+  "declared_files": 1,
+  "declared_bytes": 1024,
+  "reserved_bytes": 1024,
+  "state": "open",
+  "created_at": "2026-09-24T10:00:00Z",
+  "updated_at": "2026-09-24T10:00:00Z",
+  "expires_at": "2026-10-01T10:00:00Z",
+  "part_size": 8388608,
+  "parallel": 4,
+  "small_max": 1048576
+}

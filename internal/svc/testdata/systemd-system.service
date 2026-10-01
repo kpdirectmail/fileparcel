@@ -1,0 +1,35 @@
+[Unit]
+Description=FileParcel file sharing server
+Documentation=file:///opt/fileparcel/docs/FILEPARCEL.md
+After=network-online.target
+Wants=network-online.target
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStart="/opt/fileparcel/bin/fileparcel" serve --home "/opt/fileparcel"
+Restart=always
+RestartSec=2
+TimeoutStopSec=40
+WatchdogSec=60
+UMask=0077
+NoNewPrivileges=yes
+LimitNOFILE=65536
+User=fileparcel
+Group=fileparcel
+ProtectSystem=strict
+ReadWritePaths="/opt/fileparcel"
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectKernelLogs=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
+RestrictNamespaces=yes
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+[Install]
+WantedBy=multi-user.target

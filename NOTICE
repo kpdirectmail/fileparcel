@@ -1,0 +1,32 @@
+FileParcel
+Copyright 2026 The FileParcel Authors
+
+This product is licensed under the Apache License, Version 2.0 (see LICENSE).
+
+FileParcel is distributed as a single statically linked binary that includes
+third-party software. Each component remains under its own license; the
+complete list of components, versions and licenses is in docs/THIRD_PARTY.md
+(also shipped in every release zip and copied into <HOME>/docs at install).
+
+The following notice is reproduced as required by section 4(d) of the Apache
+License, Version 2.0 for a component that ships a NOTICE file:
+
+-------------------------------------------------------------------------------
+github.com/pquerna/otp (Apache-2.0)
+
+otp
+Copyright (c) 2014, Paul Querna
+
+This product includes software developed by
+Paul Querna (http://paul.querna.org/).
+-------------------------------------------------------------------------------
+
+Other notable components:
+
+- SQLite (embedded through modernc.org/sqlite), whose authors have dedicated
+  the code to the public domain.
+- The Go standard library, Copyright (c) 2009 The Go Authors (BSD-3-Clause),
+  including the embedded IANA time zone database (public domain).
+- The icon sprite in web/static/icons/sprite.svg contains icons derived from
+  Lucide (https://lucide.dev), Copyright (c) Lucide Contributors 2022, portions
+  Copyright (c) Cole Bemis 2013-2022 (Feather), licensed under the ISC License.

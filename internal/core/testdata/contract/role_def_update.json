@@ -1,0 +1,9 @@
+{
+  "add_permissions": [
+    "audit.view"
+  ],
+  "remove_permissions": [
+    "shares.links"
+  ],
+  "delegable": false
+}

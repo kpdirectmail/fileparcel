@@ -1,0 +1,28 @@
+FileParcel install plan (dry run: nothing will be changed)
+
+  Install directory:  /ROOT/fp
+  Version:            v7 abc1234 2026-09-19
+  Binary:             /ROOT/release/bin/fileparcel-linux-amd64 -> /ROOT/fp/bin/fileparcel
+  Service:            systemd user service, start at boot: yes (enables linger for alice)
+  Ports:              HTTPS 8444, HTTP redirect 8080
+  Server name:        fileparcel.local
+  Admin:              alice, password generated (shown once, must be changed at the first sign-in)
+  Master key:         plain key file (unlocked automatically)
+  Network access:     allowlist (loopback + detected private LAN/Wi-Fi subnets, tailnet and VPN ranges + 10.8.0.0/24)
+  Command:            /ROOT/home/alice/.local/bin/fileparcel -> /ROOT/fp/bin/fileparcel
+
+Steps:
+   1. Initialise /ROOT/fp: layout, master key, local CA and certificates, network policy, owner alice, backup identity
+        fileparcel.toml, data/, keys/master.key, certs/ (CA, client CA, leaf), owner account, backup identity
+   2. Install the binary and support files
+        /ROOT/fp/bin/fileparcel (0755), /ROOT/fp/VERSION
+        /ROOT/release/uninstall.sh -> /ROOT/fp/uninstall.sh
+        /ROOT/release/docs/ -> /ROOT/fp/docs/
+   3. Link /ROOT/home/alice/.local/bin/fileparcel -> /ROOT/fp/bin/fileparcel
+   4. Register the systemd user service, enable it at boot and start it
+        registration: /ROOT/home/alice/.config/systemd/user/fileparcel.service
+        loginctl enable-linger alice (if not enabled yet)
+   5. Record the installation in /ROOT/fp/service/installed.json
+   6. Check https://127.0.0.1:8444/healthz (up to 1s)
+
+Note: port 8443 is in use; using 8444 instead

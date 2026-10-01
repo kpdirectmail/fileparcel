@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/kpdirectmail/fileparcel/security/advisories/new
+    about: Please report security problems privately, never in a public issue.
+  - name: Documentation and troubleshooting
+    url: https://github.com/kpdirectmail/fileparcel/blob/main/docs/FILEPARCEL.md#troubleshooting-and-faq
+    about: The user manual, the install guide and answers to common problems.

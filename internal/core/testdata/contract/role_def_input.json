@@ -1,0 +1,11 @@
+{
+  "name": "Helpdesk",
+  "description": "Front-line support",
+  "base": "member",
+  "copy_from": "member",
+  "permissions": [
+    "users.manage",
+    "users.credentials"
+  ],
+  "delegable": true
+}

@@ -1,0 +1,11 @@
+{
+  "id": "ver_01k5z8r3m9d4q7w2x6c1v0b5nj",
+  "node_id": "nod_01k5z8r3m9d4q7w2x6c1v0b5ng",
+  "size": 2048,
+  "content_hash": "b3:0123",
+  "created_at": "2026-09-24T10:00:00Z",
+  "created_by": "usr_01k5z8r3m9d4q7w2x6c1v0b5nb",
+  "zip_encryption": "aes256",
+  "created_by_name": "Alice",
+  "current": true
+}

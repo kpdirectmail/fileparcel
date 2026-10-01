@@ -1,0 +1,20 @@
+FileParcel upgrade plan (dry run: nothing will be changed)
+
+  Install directory:  /ROOT/fp
+  Installed version:  v7 abc1234 2026-09-19
+  New version:        v8 def5678 2026-10-01
+  New binary:         /ROOT/new-fileparcel
+  Service:            systemd user service (running)
+
+Steps:
+   1. Create a pre-upgrade metadata backup
+   2. Stop the service
+   3. Install the new binary (the current one is kept as bin/fileparcel.prev)
+        /ROOT/new-fileparcel -> /ROOT/fp/bin/fileparcel
+   4. Refresh the service registration and start it
+        /ROOT/home/alice/.config/systemd/user/fileparcel.service
+   5. Check https://127.0.0.1:9443/healthz (up to 1s)
+   6. Update VERSION
+   7. Record the new version in /ROOT/fp/service/installed.json
+
+uninstall.sh and docs/ are not refreshed: none were found for the new binary (they come from the release zip, --source, or the release directory whose SHA256SUMS lists the binary).

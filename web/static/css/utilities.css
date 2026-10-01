@@ -1,0 +1,69 @@
+/* Single-purpose helpers. Imported into @layer utilities (highest layer) so they always win over components. */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+.hidden { display: none !important; }
+.muted { color: var(--fp-text-muted); }
+.subtle { color: var(--fp-text-subtle); }
+.danger-text { color: var(--fp-danger-text); }
+.success-text { color: var(--fp-success-text); }
+.warning-text { color: var(--fp-warning-text); }
+.primary-text { color: var(--fp-primary-text); }
+.mono { font-family: var(--fp-font-mono); }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.break { overflow-wrap: anywhere; }
+.tabular { font-variant-numeric: tabular-nums; }
+.text-xs { font-size: var(--fp-text-xs); }
+.text-sm { font-size: var(--fp-text-sm); }
+.text-md { font-size: var(--fp-text-md); }
+.text-lg { font-size: var(--fp-text-lg); }
+.text-center { text-align: center; }
+.text-end { text-align: end; }
+.bold { font-weight: var(--fp-weight-semibold); }
+.flex { display: flex; }
+.grow { flex: 1; min-width: 0; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.wrap { flex-wrap: wrap; }
+.gap-1 { gap: var(--fp-space-1); }
+.gap-2 { gap: var(--fp-space-2); }
+.gap-3 { gap: var(--fp-space-3); }
+.gap-4 { gap: var(--fp-space-4); }
+.gap-6 { gap: var(--fp-space-6); }
+.mt-0 { margin-block-start: 0; }
+.mt-2 { margin-block-start: var(--fp-space-2); }
+.mt-4 { margin-block-start: var(--fp-space-4); }
+.mt-6 { margin-block-start: var(--fp-space-6); }
+.mb-2 { margin-block-end: var(--fp-space-2); }
+.mb-4 { margin-block-end: var(--fp-space-4); }
+.mb-6 { margin-block-end: var(--fp-space-6); }
+.p-0 { padding: 0; }
+.w-full { width: 100%; }
+.max-readable { max-width: var(--fp-readable-max); }
+.rounded { border-radius: var(--fp-radius); }
+.no-select { user-select: none; }
+
+@media (max-width: 639px) {
+  .hide-sm { display: none !important; }
+}
+@media (min-width: 640px) {
+  .only-sm { display: none !important; }
+}
+@media (max-width: 1023px) {
+  .hide-md { display: none !important; }
+}
+@media (min-width: 1024px) {
+  .only-md { display: none !important; }
+}
+@media (pointer: coarse) {
+  .hide-touch { display: none !important; }
+}

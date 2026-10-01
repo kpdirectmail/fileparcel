@@ -1,0 +1,132 @@
+/* Public auth pages (login, invite, setup, unlock, trust, error). Owned by J2; @layer pages.
+ * The public shell (.public-shell/.public-main/.auth-card) lives in layout.css; this file refines the card content. */
+
+.auth-card-slot { display: contents; }
+
+.auth-card-icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--fp-primary-soft);
+  color: var(--fp-primary-text);
+}
+.auth-card-icon .icon { width: 28px; height: 28px; stroke-width: 1.75; }
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--fp-space-3);
+  color: var(--fp-text-subtle);
+  font-size: var(--fp-text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; border-top: 1px solid var(--fp-border); }
+
+.auth-links { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--fp-space-1) var(--fp-space-4); font-size: var(--fp-text-sm); }
+.auth-links a:not(.btn) { display: inline-flex; align-items: center; min-height: var(--fp-touch); } /* ≥ 44 px on touch (§13.5) */
+.auth-links .btn--ghost { min-height: var(--fp-touch); }
+
+.auth-message {
+  padding: var(--fp-space-3) var(--fp-space-4);
+  border-radius: var(--fp-radius);
+  border-inline-start: 3px solid var(--fp-accent-kraft);
+  background: var(--fp-surface-2);
+  color: var(--fp-text);
+  font-size: var(--fp-text-sm);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.auth-note { font-size: var(--fp-text-sm); color: var(--fp-text-muted); text-align: center; }
+
+.auth-details {
+  border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius);
+  background: var(--fp-surface-2);
+  font-size: var(--fp-text-sm);
+}
+.auth-details > summary {
+  display: flex;
+  align-items: center;
+  min-height: var(--fp-touch);
+  padding: 0 var(--fp-space-4);
+  cursor: pointer;
+  color: var(--fp-text-muted);
+  font-weight: var(--fp-weight-medium);
+  list-style-position: inside;
+}
+.auth-details > summary:hover { color: var(--fp-text); }
+.auth-details > div { padding: 0 var(--fp-space-4) var(--fp-space-4); color: var(--fp-text-muted); }
+.auth-details code { overflow-wrap: anywhere; }
+
+.invite-facts {
+  display: grid;
+  gap: var(--fp-space-1);
+  padding: var(--fp-space-3) var(--fp-space-4);
+  list-style: none;
+  border-radius: var(--fp-radius);
+  background: var(--fp-primary-soft);
+  color: var(--fp-text);
+  font-size: var(--fp-text-sm);
+}
+
+/* ---- password strength meter (public/password-strength.js; also used by settings/admin pages) ---- */
+.pw-meter { display: grid; gap: 6px; }
+.pw-meter[data-score="none"] { display: none; }
+.pw-meter-bars { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+.pw-meter-bar {
+  height: 4px;
+  border-radius: var(--fp-radius-full);
+  background: var(--fp-surface-3);
+  transition: background-color var(--fp-dur) var(--fp-ease);
+}
+.pw-meter[data-score="0"] .pw-meter-bar.is-on,
+.pw-meter[data-score="1"] .pw-meter-bar.is-on { background: var(--fp-danger); }
+.pw-meter[data-score="2"] .pw-meter-bar.is-on { background: var(--fp-warning); }
+.pw-meter[data-score="3"] .pw-meter-bar.is-on { background: var(--fp-success); }
+.pw-meter[data-score="4"] .pw-meter-bar.is-on { background: var(--fp-success); }
+.pw-meter-text { display: flex; flex-wrap: wrap; gap: 2px var(--fp-space-2); font-size: var(--fp-text-xs); }
+.pw-meter-label { font-weight: var(--fp-weight-semibold); }
+.pw-meter[data-score="0"] .pw-meter-label, .pw-meter[data-score="1"] .pw-meter-label { color: var(--fp-danger-text); }
+.pw-meter[data-score="2"] .pw-meter-label { color: var(--fp-warning-text); }
+.pw-meter[data-score="3"] .pw-meter-label, .pw-meter[data-score="4"] .pw-meter-label { color: var(--fp-success-text); }
+.pw-meter-hint { color: var(--fp-text-muted); }
+
+/* ---- /trust ---- */
+.trust-layout {
+  display: grid;
+  gap: var(--fp-space-5);
+  width: min(1080px, 100%);
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+}
+.trust-layout > .auth-card { width: 100%; }
+@media (min-width: 960px) {
+  .trust-layout { grid-template-columns: minmax(0, 1fr) 320px; }
+}
+.trust-side { min-width: 0; }
+.trust-side .card { gap: var(--fp-space-3); }
+.trust-side h2 { font-size: var(--fp-text-md); }
+.trust-steps { display: grid; gap: var(--fp-space-3); padding-inline-start: 1.4em; }
+.trust-steps li { padding-inline-start: var(--fp-space-1); overflow-wrap: anywhere; }
+.trust-steps li::marker { color: var(--fp-primary-text); font-weight: var(--fp-weight-bold); }
+.trust-steps code { font-size: 0.85em; }
+.trust-qr { display: grid; gap: var(--fp-space-3); justify-items: center; text-align: center; }
+.trust-qr .qr { width: 168px; height: 168px; }
+.trust-downloads { display: flex; flex-wrap: wrap; gap: var(--fp-space-2); }
+#trust-panel { min-width: 0; }
+#trust-panel:focus-visible { outline-offset: 4px; }
+.auth-card .tabs { max-width: 100%; }
+
+.fingerprint {
+  font-family: var(--fp-font-mono);
+  font-size: var(--fp-text-xs);
+  overflow-wrap: anywhere;
+  padding: var(--fp-space-3);
+  border-radius: var(--fp-radius);
+  background: var(--fp-sunken);
+  border: 1px solid var(--fp-border);
+}

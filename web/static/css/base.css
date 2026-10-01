@@ -1,0 +1,179 @@
+/*
+ * Base element styles: typography, links, focus-visible, forms, selection, reduced motion.
+ * Imported into @layer base. (The reset lives in reset.css → @layer reset, which §13.4 orders first.)
+ */
+html {
+  font-family: var(--fp-font);
+  font-size: 100%;
+  background: var(--fp-bg);
+  color: var(--fp-text);
+  accent-color: var(--fp-primary);
+  scrollbar-gutter: stable;
+}
+
+/* html keeps a stable scrollbar gutter (no sideways jump between short and long pages). A modal's ::backdrop
+   covers the viewport but not that gutter, so the canvas colour (html's background) is dimmed to match while a
+   modal dialog, sheet or the preview is open; the body keeps painting the page itself. */
+html:has(dialog.dialog[open], dialog.sheet[open]) {
+  background: light-dark(color-mix(in oklch, var(--fp-bg) 60%, oklch(0.2 0.02 255)), color-mix(in oklch, var(--fp-bg) 40%, oklch(0.05 0.01 255)));
+}
+html.pv-open { background: oklch(0.1 0.01 255); }
+
+body {
+  font-size: var(--fp-text-base);
+  line-height: var(--fp-leading);
+  background: var(--fp-bg);
+  color: var(--fp-text);
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: var(--fp-leading-tight);
+  font-weight: var(--fp-weight-semibold);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+h1 { font-size: var(--fp-text-2xl); letter-spacing: -0.02em; }
+h2 { font-size: var(--fp-text-xl); }
+h3 { font-size: var(--fp-text-lg); }
+h4 { font-size: var(--fp-text-md); }
+h5, h6 { font-size: var(--fp-text-base); }
+
+p { text-wrap: pretty; }
+small { font-size: var(--fp-text-sm); }
+strong, b { font-weight: var(--fp-weight-semibold); }
+
+a {
+  color: var(--fp-primary-text);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in oklch, currentColor 40%, transparent);
+}
+a:hover { text-decoration-color: currentColor; }
+
+code, kbd, samp, pre {
+  font-family: var(--fp-font-mono);
+  font-size: 0.9em;
+}
+code {
+  padding: 0.1em 0.35em;
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-surface-2);
+  border: 1px solid var(--fp-border);
+}
+pre {
+  overflow: auto;
+  padding: var(--fp-space-3) var(--fp-space-4);
+  border-radius: var(--fp-radius);
+  background: var(--fp-sunken);
+  border: 1px solid var(--fp-border);
+}
+pre code { padding: 0; border: 0; background: none; }
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0.05em 0.4em;
+  border-radius: var(--fp-radius-sm);
+  border: 1px solid var(--fp-border-strong);
+  border-bottom-width: 2px;
+  background: var(--fp-surface);
+  font-size: 0.8em;
+  text-align: center;
+  color: var(--fp-text-muted);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--fp-border);
+  margin-block: var(--fp-space-4);
+}
+
+::selection { background: var(--fp-selection); }
+
+/* ---- focus ---- */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--fp-focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--fp-radius-sm);
+}
+[tabindex="-1"]:focus-visible { outline: none; }
+
+/* ---- forms (element level; component classes refine) ---- */
+/* The font size is the inherited one (reset: font: inherit), floored at --fp-input-min: 16 px on touch screens so
+   iOS does not zoom on focus, 0 elsewhere. A component that sets a smaller size must floor it the same way. */
+input:not([type="checkbox"], [type="radio"], [type="range"], [type="file"], [type="color"]),
+select,
+textarea {
+  width: 100%;
+  min-height: var(--fp-control-h);
+  font-size: max(var(--fp-input-min), 1em);
+  padding: 0 var(--fp-space-3);
+  border: 1px solid var(--fp-border-strong);
+  border-radius: var(--fp-radius-sm);
+  background: var(--fp-surface);
+  color: var(--fp-text);
+  transition: border-color var(--fp-dur-fast) var(--fp-ease), box-shadow var(--fp-dur-fast) var(--fp-ease);
+}
+textarea {
+  padding: var(--fp-space-2) var(--fp-space-3);
+  min-height: calc(var(--fp-control-h) * 2.5);
+  resize: vertical;
+  line-height: var(--fp-leading);
+}
+select {
+  appearance: none;
+  padding-inline-end: var(--fp-space-8);
+  background-image: linear-gradient(45deg, transparent 50%, var(--fp-text-muted) 50%),
+    linear-gradient(135deg, var(--fp-text-muted) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+}
+input::placeholder, textarea::placeholder { color: var(--fp-text-subtle); }
+input:hover:not(:disabled), select:hover:not(:disabled), textarea:hover:not(:disabled) {
+  border-color: color-mix(in oklch, var(--fp-border-strong), var(--fp-text) 15%);
+}
+input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: none;
+  border-color: var(--fp-primary);
+  box-shadow: 0 0 0 3px var(--fp-primary-soft-2);
+}
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] {
+  border-color: var(--fp-danger);
+}
+input[aria-invalid="true"]:focus-visible, textarea[aria-invalid="true"]:focus-visible {
+  box-shadow: 0 0 0 3px var(--fp-danger-soft);
+}
+input:disabled, select:disabled, textarea:disabled, button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+input[readonly] { background: var(--fp-surface-2); }
+input[type="checkbox"], input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  cursor: pointer;
+}
+input[type="search"]::-webkit-search-cancel-button { cursor: pointer; }
+label { cursor: default; }
+
+/* ---- media ---- */
+img, video { height: auto; }
+
+/* ---- motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html:focus-within { scroll-behavior: smooth; }
+}

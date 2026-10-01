@@ -1,0 +1,2 @@
+# The 7-Zip fixtures were made from these exact bytes: never convert line endings.
+7z-src/* -text

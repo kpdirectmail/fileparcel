@@ -1,0 +1,30 @@
+# Local installed instance (database, blobs, keys, certs, backups, logs) — never commit
+/server/
+# Docker Compose quick start (docker-compose.yml): the container's home and the
+# admin password — never commit (.dockerignore keeps them out of the image too)
+/fileparcel-data/
+/secrets/
+# Versioned release zips produced by the post-commit hook
+/releases/
+# Build output
+/dist/
+/bin/
+# "go build ./cmd/fileparcel" in the repository root
+/fileparcel
+*.test
+*.out
+*.pid
+# Anchored: unanchored "coverage.*" also swallowed tests/smoke/coverage.py,
+# which the smoke harness executes. Go's coverage.out is covered by *.out.
+/coverage.*
+# Test artefacts
+/tests/ui/.venv/
+/tests/ui/screenshots/
+/tests/ui/.pytest_cache/
+__pycache__/
+/tmp/
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp

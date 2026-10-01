@@ -1,0 +1,182 @@
+# Every command path of FileParcel before the v4 command tidy-up (commit 27e429f),
+# with its aliases after "|". TestLegacyInvocations checks that each one, and
+# each alias, still resolves to a runnable command. Never edit existing lines:
+# they are what scripts and people typed.
+audit
+audit export
+audit list | ls
+audit verify
+backup | backups
+backup config
+backup config set
+backup config show
+backup create
+backup delete | rm
+backup export
+backup identity
+backup identity generate
+backup identity show
+backup import
+backup list | ls
+backup prune
+backup schedule
+backup schedule disable
+backup schedule enable
+backup schedule set
+backup schedule show
+backup show
+backup verify
+ca
+ca export
+ca fingerprint
+ca regenerate
+ca show
+ca trust-help
+cert | certs tls
+cert acme
+cert acme disable
+cert acme enable
+cert clear-custom
+cert renew
+cert sans
+cert status
+cert tailscale
+cert tailscale disable
+cert tailscale enable
+cert tailscale fetch
+cert upload
+client-cert | client-certs mtls
+client-cert issue
+client-cert list | ls
+client-cert revoke
+completion
+config | settings
+config edit
+config get
+config list | ls
+config path
+config set
+config unset | reset
+db | database
+db check
+db migrate
+db stats
+db vacuum
+doctor
+files | file fs
+files cp
+files get
+files info | stat show
+files ls | list
+files mkdir
+files mv
+files put
+files restore
+files rm | delete trash-put
+files search
+files trash
+files tree
+files versions
+gc
+group | groups
+group add-member
+group create
+group delete | rm
+group list | ls
+group members
+group remove-member
+group rename
+healthcheck
+init
+install
+invite | invites
+invite create
+invite list | ls
+invite revoke
+jobs | job
+jobs cancel
+jobs list | ls
+jobs run
+jobs show
+keys
+keys export-recovery
+keys lock
+keys passphrase
+keys rotate
+keys seal
+keys status
+keys unlock
+keys unseal
+keys verify
+logs
+maintenance
+mdns | bonjour
+mdns disable
+mdns enable
+mdns mode
+mdns name
+mdns republish
+mdns status
+network | net
+network allow
+network allow add
+network allow list | ls
+network allow remove
+network deny
+network deny add
+network deny list | ls
+network deny remove
+network interfaces | if ifaces
+network mode
+network policy
+network urls
+open
+request | requests
+request close
+request create
+request delete | revoke rm
+request list | ls
+request log
+request show
+restore
+serve
+service
+service disable-boot
+service enable-boot
+service install
+service print
+service restart
+service start
+service status
+service stop
+service uninstall
+share | shares link links
+share create
+share edit
+share list | ls
+share log
+share revoke | delete rm
+share show
+status
+token | tokens
+token create
+token list | ls
+token revoke
+uninstall
+upgrade
+user | users
+user add
+user delete | rm
+user disable
+user edit
+user enable
+user list | ls
+user passwd
+user quota
+user reset-2fa | reset-mfa
+user revoke-sessions
+user sessions
+user set-role
+user show
+user unlock
+version

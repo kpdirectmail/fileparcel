@@ -1,0 +1,28 @@
+{
+  "kind": "funnel",
+  "mode": "shares",
+  "port": 443,
+  "host_port": "box.tail1234.ts.net:443",
+  "url": "https://box.tail1234.ts.net/",
+  "backend": "unix:/srv/fileparcel/run/ts-funnel.sock",
+  "state": "active",
+  "applied_at": "2026-09-24T10:00:00Z",
+  "last_request_at": "2026-09-24T11:30:00Z",
+  "last_public_request_at": "2026-09-24T11:30:00Z",
+  "probed_at": "2026-09-24T10:00:00Z",
+  "checks": [
+    {
+      "id": "tailscale.https",
+      "label": "HTTPS certificates",
+      "status": "ok"
+    },
+    {
+      "id": "tailscale.funnel_attr",
+      "label": "Funnel permission",
+      "status": "warn",
+      "message": "the tailnet policy does not grant funnel",
+      "hint": "add the funnel node attribute",
+      "fix_url": "https://login.tailscale.com/admin/acls"
+    }
+  ]
+}

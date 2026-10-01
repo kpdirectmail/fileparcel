@@ -1,0 +1,220 @@
+/*
+ * Design tokens (--fp-*). Imported into @layer tokens.
+ *
+ * Theme model: colours use light-dark(); the used colour scheme comes from `color-scheme`:
+ *   <html data-theme="system">  → follows the OS (color-scheme: light dark)
+ *   <html data-theme="light">   → forced light
+ *   <html data-theme="dark">    → forced dark
+ * Brand colour: `--fp-brand` (default oklch(0.58 0.16 255)) → `--fp-primary` (lightened for dark mode).
+ * The server-generated /theme.css (unlayered, so it wins) sets --fp-brand and plain --fp-primary/--fp-on-primary
+ * values from ui.accent_color, the light-dark() pair only behind @supports (an unguarded one would void the fallback
+ * below) and plain hover/soft/text tints behind @supports not. Hover/soft/text/focus tokens derive from
+ * --fp-primary via color-mix().
+ * Density: <html data-density="compact"> tightens control and row heights.
+ */
+:root {
+  color-scheme: light dark;
+
+  /* ---- brand ---- */
+  --fp-brand: oklch(0.58 0.16 255);
+  --fp-kraft-base: oklch(0.74 0.11 70);
+
+  /* ---- neutrals (warm paper in light, deep blue-grey in dark) ---- */
+  --fp-bg: light-dark(oklch(0.982 0.005 80), oklch(0.19 0.012 255));
+  /* The light surface leaves its hue MISSING (`none`), not 0: white is hueless, and a literal 0 makes
+     color-mix(… var(--fp-surface)) interpolate *away* from the brand hue (5 % of the way from 0 to 255 lands
+     on 354.75°, i.e. rose — the selected choice card in settings.css). A missing component takes the other
+     colour's hue instead, so a tint keeps the accent's own hue even under a /theme.css override. */
+  --fp-surface: light-dark(oklch(1 0 none), oklch(0.225 0.014 255));
+  --fp-surface-2: light-dark(oklch(0.963 0.007 80), oklch(0.255 0.016 255));
+  --fp-surface-3: light-dark(oklch(0.935 0.009 80), oklch(0.29 0.018 255));
+  --fp-sunken: light-dark(oklch(0.955 0.008 80), oklch(0.165 0.012 255));
+  --fp-border: light-dark(oklch(0.9 0.01 80), oklch(0.33 0.018 255));
+  --fp-border-strong: light-dark(oklch(0.82 0.012 80), oklch(0.42 0.02 255));
+  --fp-text: light-dark(oklch(0.25 0.02 255), oklch(0.94 0.008 255));
+  --fp-text-muted: light-dark(oklch(0.5 0.02 255), oklch(0.74 0.015 255));
+  --fp-text-subtle: light-dark(oklch(0.62 0.015 255), oklch(0.6 0.015 255));
+  --fp-overlay: light-dark(oklch(0.2 0.02 255 / 0.4), oklch(0.05 0.01 255 / 0.6));
+
+  /* ---- semantic colours ----
+   * Everything below derives from --fp-primary with color-mix(), so /theme.css may override either
+   * --fp-brand (dark variant derived automatically) or --fp-primary directly (same colour in both themes). */
+  --fp-primary: light-dark(var(--fp-brand), oklch(from var(--fp-brand) max(l, 0.64) c h));
+  --fp-primary-hover: light-dark(color-mix(in oklch, var(--fp-primary), black 14%), color-mix(in oklch, var(--fp-primary), white 12%));
+  --fp-primary-soft: color-mix(in oklch, var(--fp-primary) 14%, transparent);
+  --fp-primary-soft-2: color-mix(in oklch, var(--fp-primary) 22%, transparent);
+  --fp-primary-text: light-dark(color-mix(in oklch, var(--fp-primary), black 18%), color-mix(in oklch, var(--fp-primary), white 38%));
+  /* Text on the primary / danger fills: white in light mode, near-black in dark mode, where both fills are
+     lightened past the point white text stays readable (WCAG AA 4.5:1 for the 13–14 px button labels; the dark
+     value matches theme.go's onDark). internal/web/pages (TestTokensOnColorContrast) checks the dark-scheme ratios
+     against the fills below and their hover mixes. */
+  --fp-on-primary: light-dark(oklch(1 0 0), oklch(0.18 0.02 255));
+
+  --fp-accent-kraft: light-dark(oklch(0.7 0.12 65), oklch(0.78 0.1 70));
+  --fp-accent-kraft-soft: color-mix(in oklch, var(--fp-accent-kraft) 18%, transparent);
+  --fp-accent-kraft-text: light-dark(oklch(0.48 0.1 60), oklch(0.84 0.09 70));
+
+  --fp-success: light-dark(oklch(0.58 0.14 150), oklch(0.74 0.14 150));
+  --fp-warning: light-dark(oklch(0.7 0.15 70), oklch(0.8 0.14 80));
+  --fp-danger: light-dark(oklch(0.56 0.19 27), oklch(0.7 0.17 25));
+  --fp-info: light-dark(oklch(0.58 0.12 230), oklch(0.74 0.11 230));
+  --fp-success-soft: color-mix(in oklch, var(--fp-success) 15%, transparent);
+  --fp-warning-soft: color-mix(in oklch, var(--fp-warning) 18%, transparent);
+  --fp-danger-soft: color-mix(in oklch, var(--fp-danger) 14%, transparent);
+  --fp-info-soft: color-mix(in oklch, var(--fp-info) 14%, transparent);
+  --fp-success-text: light-dark(oklch(0.45 0.12 150), oklch(0.8 0.13 150));
+  --fp-warning-text: light-dark(oklch(0.48 0.12 60), oklch(0.85 0.12 80));
+  --fp-danger-text: light-dark(oklch(0.5 0.18 27), oklch(0.78 0.14 25));
+  --fp-info-text: light-dark(oklch(0.47 0.11 235), oklch(0.8 0.1 230));
+  --fp-on-danger: light-dark(oklch(1 0 0), oklch(0.18 0.02 255));
+
+  --fp-focus-ring: light-dark(color-mix(in oklch, var(--fp-primary), black 8%), color-mix(in oklch, var(--fp-primary), white 30%));
+  --fp-selection: color-mix(in oklch, var(--fp-primary) 28%, transparent);
+
+  /* ---- spacing (4 px scale) ---- */
+  --fp-space-1: 4px;
+  --fp-space-2: 8px;
+  --fp-space-3: 12px;
+  --fp-space-4: 16px;
+  --fp-space-5: 20px;
+  --fp-space-6: 24px;
+  --fp-space-7: 32px;
+  --fp-space-8: 40px;
+  --fp-space-9: 48px;
+  --fp-space-10: 64px;
+
+  /* ---- radii ---- */
+  --fp-radius-sm: 6px;
+  --fp-radius: 10px;
+  --fp-radius-lg: 14px;
+  --fp-radius-full: 999px;
+
+  /* ---- shadows ---- */
+  --fp-shadow-1: 0 1px 2px light-dark(oklch(0.3 0.02 255 / 0.08), oklch(0 0 0 / 0.4));
+  --fp-shadow-2: 0 2px 6px light-dark(oklch(0.3 0.02 255 / 0.08), oklch(0 0 0 / 0.35)),
+    0 8px 24px light-dark(oklch(0.3 0.02 255 / 0.1), oklch(0 0 0 / 0.45));
+  --fp-shadow-3: 0 4px 12px light-dark(oklch(0.3 0.02 255 / 0.1), oklch(0 0 0 / 0.4)),
+    0 24px 64px light-dark(oklch(0.3 0.02 255 / 0.18), oklch(0 0 0 / 0.6));
+
+  /* ---- typography (fluid 12–32 px) ---- */
+  --fp-font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Ubuntu, Cantarell, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji";
+  --fp-font-mono: ui-monospace, "SFMono-Regular", "Cascadia Mono", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --fp-text-xs: 0.75rem;
+  --fp-text-sm: clamp(0.8125rem, 0.79rem + 0.1vw, 0.875rem);
+  --fp-text-base: clamp(0.9375rem, 0.91rem + 0.12vw, 1rem);
+  --fp-text-md: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --fp-text-lg: clamp(1.125rem, 1.06rem + 0.3vw, 1.3125rem);
+  --fp-text-xl: clamp(1.25rem, 1.14rem + 0.55vw, 1.625rem);
+  --fp-text-2xl: clamp(1.5rem, 1.3rem + 0.9vw, 2rem);
+  --fp-leading: 1.5;
+  --fp-leading-tight: 1.25;
+  --fp-weight-medium: 500;
+  --fp-weight-semibold: 600;
+  --fp-weight-bold: 700;
+
+  /* ---- motion ---- */
+  --fp-dur-fast: 120ms;
+  --fp-dur: 200ms;
+  --fp-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --fp-ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ---- z-index scale ---- */
+  --fp-z-base: 1;
+  --fp-z-sticky: 10;
+  --fp-z-nav: 20;
+  --fp-z-drawer: 30;
+  --fp-z-overlay: 40;
+  --fp-z-dialog: 50;
+  --fp-z-menu: 60;
+  --fp-z-toast: 70;
+  --fp-z-max: 90;
+
+  /* ---- sizing / density ---- */
+  --fp-control-h: 40px;
+  --fp-control-h-sm: 32px;
+  --fp-row-h: 48px;
+  --fp-icon: 20px;
+  --fp-touch: 40px;
+  --fp-input-min: 0px; /* floor of a text field's font size (see the coarse-pointer block) */
+  --fp-sidebar-w: 264px;
+  --fp-rail-w: 76px;
+  --fp-topbar-h: 60px;
+  --fp-tabbar-h: 64px;
+  --fp-content-max: 1280px;
+  --fp-readable-max: 72ch;
+}
+
+:root[data-theme="light"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
+:root[data-theme="system"] { color-scheme: light dark; }
+
+:root[data-density="compact"] {
+  --fp-control-h: 34px;
+  --fp-control-h-sm: 28px;
+  --fp-row-h: 38px;
+}
+
+/* Coarse pointers (touch): ≥ 44 px targets regardless of density (§13.5) — small controls included — and text
+   fields of at least 16 px: iOS Safari zooms the page into any focused input, select or textarea smaller than that
+   (and does not zoom back out), and --fp-text-base is only ~15 px at phone widths. */
+@media (pointer: coarse) {
+  :root, :root[data-density="compact"] {
+    --fp-control-h: 44px;
+    --fp-control-h-sm: 44px;
+    --fp-row-h: 56px;
+    --fp-touch: 44px;
+    --fp-input-min: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --fp-dur-fast: 0ms;
+    --fp-dur: 0ms;
+  }
+}
+
+/* Fallback for browsers without light-dark()/relative colours (light palette only). */
+@supports not (color: light-dark(#000, #fff)) {
+  :root {
+    --fp-bg: #faf8f5;
+    --fp-surface: #ffffff;
+    --fp-surface-2: #f5f2ee;
+    --fp-surface-3: #ece8e2;
+    --fp-sunken: #f2efea;
+    --fp-border: #e3ded6;
+    --fp-border-strong: #cdc6bb;
+    --fp-text: #1f2833;
+    --fp-text-muted: #5b6573;
+    --fp-text-subtle: #7d8793;
+    --fp-overlay: rgb(20 26 34 / 0.4);
+    --fp-primary: #2b7ad6;
+    --fp-primary-hover: #1f68bf;
+    --fp-primary-soft: rgb(43 122 214 / 0.12);
+    --fp-primary-soft-2: rgb(43 122 214 / 0.2);
+    --fp-primary-text: #1d5fae;
+    --fp-on-primary: #ffffff;
+    --fp-on-danger: #ffffff;
+    --fp-accent-kraft: #c98a42;
+    --fp-accent-kraft-soft: rgb(201 138 66 / 0.16);
+    --fp-accent-kraft-text: #8a5520;
+    --fp-success: #2f9a5a;
+    --fp-warning: #d4952b;
+    --fp-danger: #cf3b36;
+    --fp-info: #2b8ac0;
+    --fp-success-soft: rgb(47 154 90 / 0.14);
+    --fp-warning-soft: rgb(212 149 43 / 0.16);
+    --fp-danger-soft: rgb(207 59 54 / 0.12);
+    --fp-info-soft: rgb(43 138 192 / 0.12);
+    --fp-success-text: #1f7443;
+    --fp-warning-text: #8a5a12;
+    --fp-danger-text: #b3302b;
+    --fp-info-text: #1f6a95;
+    --fp-focus-ring: #1f68bf;
+    --fp-selection: rgb(43 122 214 / 0.25);
+    --fp-shadow-1: 0 1px 2px rgb(20 26 34 / 0.08);
+    --fp-shadow-2: 0 2px 6px rgb(20 26 34 / 0.08), 0 8px 24px rgb(20 26 34 / 0.1);
+    --fp-shadow-3: 0 4px 12px rgb(20 26 34 / 0.1), 0 24px 64px rgb(20 26 34 / 0.18);
+  }
+}

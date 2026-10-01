@@ -1,0 +1,81 @@
+{
+  "available": true,
+  "transport": "localapi",
+  "funnel": {
+    "kind": "funnel",
+    "mode": "shares",
+    "port": 443,
+    "host_port": "box.tail1234.ts.net:443",
+    "url": "https://box.tail1234.ts.net/",
+    "backend": "unix:/srv/fileparcel/run/ts-funnel.sock",
+    "state": "active",
+    "applied_at": "2026-09-24T10:00:00Z",
+    "last_request_at": "2026-09-24T11:30:00Z",
+    "last_public_request_at": "2026-09-24T11:30:00Z",
+    "probed_at": "2026-09-24T10:00:00Z",
+    "checks": [
+      {
+        "id": "tailscale.https",
+        "label": "HTTPS certificates",
+        "status": "ok"
+      },
+      {
+        "id": "tailscale.funnel_attr",
+        "label": "Funnel permission",
+        "status": "warn",
+        "message": "the tailnet policy does not grant funnel",
+        "hint": "add the funnel node attribute",
+        "fix_url": "https://login.tailscale.com/admin/acls"
+      }
+    ]
+  },
+  "serve": {
+    "kind": "serve",
+    "mode": "off",
+    "port": 443,
+    "state": "off",
+    "checks": []
+  },
+  "funnel_ports": [
+    443,
+    10000
+  ],
+  "allow_admin": false,
+  "require_2fa": true,
+  "foreign": [
+    {
+      "host_port": "box.tail1234.ts.net:8443",
+      "mount": "/",
+      "target": "https+insecure://localhost:8443",
+      "funnel": false,
+      "foreground": false,
+      "bypass": true
+    }
+  ],
+  "tailscale": {
+    "running": true,
+    "kind": "tailscale",
+    "backend_state": "Running",
+    "dns_name": "box.tail1234.ts.net",
+    "tailnet": "tail1234.ts.net",
+    "control_url": "https://controlplane.tailscale.com",
+    "ips": [
+      "100.64.0.10",
+      "fd7a:115c:a1e0::1"
+    ],
+    "cert_capable": true,
+    "installed": true,
+    "version": "1.102.4",
+    "node_id": "nXXXXXXCNTRL",
+    "userspace": false,
+    "shields_up": false,
+    "can_configure": true,
+    "funnel_capable": true,
+    "funnel_ports": [
+      443,
+      8443,
+      10000
+    ],
+    "key_expiry": "2027-03-23T10:00:00Z"
+  }
+}

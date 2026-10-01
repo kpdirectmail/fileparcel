@@ -1,0 +1,22 @@
+# Keep the build context small and free of secrets: only the source is needed.
+.git
+.githooks
+server/
+releases/
+dist/
+bin/
+tmp/
+fileparcel-data/
+secrets/
+tests/ui/.venv/
+tests/ui/screenshots/
+tests/ui/.pytest_cache/
+**/__pycache__/
+*.test
+*.out
+*.pid
+coverage.*
+.DS_Store
+.idea/
+.vscode/
+*.swp

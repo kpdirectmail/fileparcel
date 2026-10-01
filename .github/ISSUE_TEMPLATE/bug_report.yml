@@ -1,0 +1,96 @@
+name: Bug report
+description: Something in FileParcel does not work as it should.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a problem.
+
+        **Security problems do not belong here.** Report them privately:
+        https://github.com/kpdirectmail/fileparcel/security/advisories/new
+
+        Before you start: run `fileparcel doctor` (it may already say what is wrong) and look through the
+        [troubleshooting FAQ](https://github.com/kpdirectmail/fileparcel/blob/main/docs/FILEPARCEL.md#troubleshooting-and-faq)
+        and [existing issues](https://github.com/kpdirectmail/fileparcel/issues).
+
+        Everything you write here is public. **Remove passwords, tokens, share links, backup identities,
+        recovery keys, and any host names, user names or IP addresses you do not want to publish.**
+  - type: input
+    id: version
+    attributes:
+      label: FileParcel version
+      description: The output of `fileparcel version` on the server.
+      placeholder: "FileParcel v1 (commit 3f9c2a1b7d4e, built 2026-10-01T10:00:00Z, go1.27.1 linux/amd64)"
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Operating system and processor
+      description: Of the server, for example "Debian 13, amd64", "Raspberry Pi OS 32-bit, Pi 3" or "macOS 15, Apple silicon".
+    validations:
+      required: true
+  - type: dropdown
+    id: install-type
+    attributes:
+      label: How is FileParcel installed?
+      options:
+        - User service (./install.sh as a normal user)
+        - System service (sudo ./install.sh)
+        - No service (./install.sh --service none, started by hand)
+        - Docker / Docker Compose
+        - Built and run from source (go run, make dev)
+        - Other or not sure
+    validations:
+      required: true
+  - type: input
+    id: client
+    attributes:
+      label: Browser and device (if the problem is in the web app)
+      description: For example "Firefox 140 on Windows 11" or "Safari on iPhone, iOS 19". Leave empty for command-line or server problems.
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do? Commands you ran, pages you opened, buttons you pressed.
+      placeholder: |
+        1. Run `fileparcel share create "/My files/report.pdf" --expires 7d`
+        2. Open the link on a phone
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead?
+      description: Include error messages exactly as shown. Screenshots help for problems in the web app.
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `fileparcel doctor`
+      description: |
+        Run it on the server (with `sudo` for a system installation, or `docker compose exec fileparcel fileparcel doctor` in Docker).
+        It contains host names and network addresses: replace private names and IPs with placeholders before you paste it.
+      render: text
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant log lines
+      description: |
+        From `fileparcel logs -n 100` (or `docker compose logs fileparcel`), around the time of the problem.
+        The log contains no passwords or keys, but it does contain user names, file names and IP addresses: remove what you do not want to publish.
+      render: text
+  - type: textarea
+    id: more
+    attributes:
+      label: Anything else?
+      description: Settings you changed, a reverse proxy or VPN in front of FileParcel, when it started happening, whether it worked before.

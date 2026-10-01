@@ -1,0 +1,5 @@
+tunnel: 1c1f0f8e-0000-4000-8000-000000000000
+ingress:
+- hostname: wiki.example.org
+  service: http://localhost:8080
+- service: http_status:404

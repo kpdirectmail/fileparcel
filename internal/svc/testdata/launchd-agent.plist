@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.fileparcel.server</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/alice/Library/Application Support/FileParcel/bin/fileparcel</string>
+		<string>serve</string>
+		<string>--home</string>
+		<string>/Users/alice/Library/Application Support/FileParcel</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>FILEPARCEL_HOME</key>
+		<string>/Users/alice/Library/Application Support/FileParcel</string>
+	</dict>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>Umask</key>
+	<integer>63</integer>
+	<key>SoftResourceLimits</key>
+	<dict>
+		<key>NumberOfFiles</key>
+		<integer>65536</integer>
+	</dict>
+	<key>StandardOutPath</key>
+	<string>/Users/alice/Library/Application Support/FileParcel/logs/launchd.out.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/alice/Library/Application Support/FileParcel/logs/launchd.err.log</string>
+	<key>WorkingDirectory</key>
+	<string>/Users/alice/Library/Application Support/FileParcel</string>
+	<key>ExitTimeOut</key>
+	<integer>40</integer>
+	<key>ProcessType</key>
+	<string>Background</string>
+</dict>
+</plist>

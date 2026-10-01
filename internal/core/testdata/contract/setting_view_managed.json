@@ -1,0 +1,19 @@
+{
+  "key": "funnel.mode",
+  "section": "funnel",
+  "order": 10,
+  "type": "enum",
+  "label": "Tailscale Funnel",
+  "value": "off",
+  "default": "off",
+  "enum": [
+    "off",
+    "shares",
+    "app"
+  ],
+  "restart": false,
+  "secret": false,
+  "is_set": false,
+  "bootstrap": false,
+  "managed": "PUT /api/v1/admin/network/funnel"
+}

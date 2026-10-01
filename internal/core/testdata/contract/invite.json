@@ -1,0 +1,18 @@
+{
+  "id": "inv_01k5z8r3m9d4q7w2x6c1v0b5nn",
+  "email": "bob@example.test",
+  "role": "member",
+  "role_id": "rol_01k5z8r3m9d4q7w2x6c1v0b5na",
+  "group_ids": [
+    "grp_01k5z8r3m9d4q7w2x6c1v0b5nd"
+  ],
+  "quota_bytes": null,
+  "max_uses": 1,
+  "uses": 0,
+  "expires_at": "2026-10-01T10:00:00Z",
+  "created_by": "usr_01k5z8r3m9d4q7w2x6c1v0b5nc",
+  "created_at": "2026-09-24T10:00:00Z",
+  "role_name": "Helpdesk",
+  "status": "active",
+  "url": "/invite/abc"
+}

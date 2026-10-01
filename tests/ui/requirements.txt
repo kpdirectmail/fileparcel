@@ -1,0 +1,6 @@
+# Playwright UI tests for FileParcel (tests/ui, DESIGN §17). Install into a
+# virtualenv (tests/ui/run.sh creates tests/ui/.venv, which is gitignored):
+#   python3 -m venv tests/ui/.venv && tests/ui/.venv/bin/pip install -r tests/ui/requirements.txt
+#   tests/ui/.venv/bin/python -m playwright install chromium   # optional: /usr/bin/brave-browser is the fallback
+playwright>=1.48,<2
+pytest>=8.0,<10

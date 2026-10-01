@@ -1,0 +1,72 @@
+{
+  "user": {
+    "id": "usr_01k5z8r3m9d4q7w2x6c1v0b5nb",
+    "username": "alice",
+    "display_name": "Alice",
+    "email": "alice@example.test",
+    "role": "member",
+    "role_id": "rol_01k5z8r3m9d4q7w2x6c1v0b5na",
+    "role_name": "Helpdesk",
+    "permissions": [
+      "shares.links",
+      "users.lookup",
+      "tokens.create",
+      "users.view",
+      "users.manage",
+      "users.credentials"
+    ],
+    "status": "active",
+    "password_changed_at": "2026-09-24T10:00:00Z",
+    "must_change_password": false,
+    "quota_bytes": 10737418240,
+    "failed_logins": 0,
+    "lock_level": 0,
+    "last_login_at": "2026-09-24T11:30:00Z",
+    "last_login_ip": "192.0.2.10",
+    "prefs": {
+      "theme": "dark"
+    },
+    "created_at": "2026-09-24T10:00:00Z",
+    "updated_at": "2026-09-24T11:30:00Z",
+    "created_by": "usr_01k5z8r3m9d4q7w2x6c1v0b5nc",
+    "space_id": "spc_01k5z8r3m9d4q7w2x6c1v0b5ne",
+    "mfa_enabled": true
+  },
+  "csrf": "csrf-token",
+  "prefs": {
+    "theme": "dark"
+  },
+  "mfa_pending": false,
+  "features": {
+    "directory": true,
+    "funnel_2fa": true,
+    "internet_links": true,
+    "links": true,
+    "mtls_self_service": false,
+    "passkeys": true,
+    "requests": true,
+    "share_password_required": false,
+    "thumbnails": true,
+    "tokens": true,
+    "zip_legacy_encryption": true
+  },
+  "space_id": "spc_01k5z8r3m9d4q7w2x6c1v0b5ne",
+  "group_space_ids": {
+    "grp_01k5z8r3m9d4q7w2x6c1v0b5nd": "spc_01k5z8r3m9d4q7w2x6c1v0b5nf"
+  },
+  "groups": [
+    {
+      "id": "grp_01k5z8r3m9d4q7w2x6c1v0b5nd",
+      "name": "Finance",
+      "description": "",
+      "created_at": "2026-09-24T10:00:00Z",
+      "member_count": 4,
+      "space_id": "spc_01k5z8r3m9d4q7w2x6c1v0b5nf",
+      "my_role": "manager",
+      "role_count": 1,
+      "via": "direct"
+    }
+  ],
+  "via": "session",
+  "staff": true
+}

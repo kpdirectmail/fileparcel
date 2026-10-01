@@ -1,0 +1,16 @@
+{
+  "name": "wg0-mullvad",
+  "kind": "exitvpn",
+  "label": "Mullvad VPN",
+  "up": true,
+  "addrs": [
+    "10.64.1.2/32"
+  ],
+  "mtu": 1380,
+  "is_vpn": true,
+  "role": "egress",
+  "role_source": "auto",
+  "provider": "mullvad",
+  "detail": "carries the default route",
+  "default_route": true
+}

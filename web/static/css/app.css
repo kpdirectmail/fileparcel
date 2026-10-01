@@ -1,0 +1,26 @@
+/*
+ * FileParcel stylesheet entry point.
+ *
+ * Cascade layers (lowest → highest priority). Anything unlayered (e.g. the server-generated /theme.css,
+ * which for a custom `ui.accent_color` sets --fp-brand, --fp-primary and --fp-on-primary, and is only a comment
+ * for the default accent) beats every layer below.
+ *
+ * Relative @import URLs resolve against this file, so they inherit the /static/<buildhash>/ prefix.
+ * Page-specific styles live in css/pages/*.css and are imported into the `pages` layer here so that
+ * no template ever needs another <link>.
+ */
+@layer reset, tokens, base, layout, components, pages, utilities;
+
+@import url("reset.css") layer(reset);
+@import url("tokens.css") layer(tokens);
+@import url("base.css") layer(base);
+@import url("layout.css") layer(layout);
+@import url("components.css") layer(components);
+@import url("pages/files.css") layer(pages);
+@import url("pages/preview.css") layer(pages);
+@import url("pages/upload.css") layer(pages);
+@import url("pages/auth.css") layer(pages);
+@import url("pages/share.css") layer(pages);
+@import url("pages/settings.css") layer(pages);
+@import url("pages/admin.css") layer(pages);
+@import url("utilities.css") layer(utilities);

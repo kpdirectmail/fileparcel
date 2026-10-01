@@ -1,0 +1,20 @@
+{
+  "id": "member",
+  "name": "Member",
+  "description": "Has “My files”, uses the team folders of their groups, shares, creates links and file requests, finds people and creates API tokens.",
+  "builtin": true,
+  "base": "member",
+  "permissions": [
+    "shares.links",
+    "shares.requests",
+    "users.lookup",
+    "tokens.create"
+  ],
+  "delegable": true,
+  "staff": false,
+  "user_count": 0,
+  "group_count": 0,
+  "grant_count": 0,
+  "editable": false,
+  "assignable": false
+}

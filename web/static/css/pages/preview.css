@@ -1,0 +1,210 @@
+/*
+ * Preview overlay (js/preview/*): a full-screen modal <dialog class="pv"> with a dark stage in both themes.
+ * Imported into @layer pages.
+ */
+.pv {
+  --pv-bg: oklch(0.14 0.01 255);
+  --pv-fg: oklch(0.96 0.005 255);
+  --pv-muted: oklch(0.76 0.01 255);
+  --pv-chrome: oklch(0.19 0.012 255 / 0.9);
+  --pv-info-w: 340px; /* the side info panel (≥ 640 px), which the Next arrow moves clear of */
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  display: none;
+  flex-direction: column;
+  background: var(--pv-bg);
+  color: var(--pv-fg);
+  color-scheme: dark;
+  overflow: hidden;
+}
+.pv[open] { display: flex; animation: fp-fade-in var(--fp-dur) var(--fp-ease); }
+.pv::backdrop { background: oklch(0 0 0 / 0.6); }
+html.pv-open { overflow: hidden; }
+
+.pv .icon-btn { --btn-fg: var(--pv-muted); }
+.pv .icon-btn:hover:not(:disabled) { background: oklch(1 0 0 / 0.1); color: var(--pv-fg); }
+.pv .icon-btn[aria-pressed="true"] { background: oklch(1 0 0 / 0.16); color: var(--pv-fg); }
+.pv .btn--ghost { --btn-fg: var(--pv-fg); }
+.pv .btn--ghost:hover:not(:disabled) { background: oklch(1 0 0 / 0.1); }
+
+.pv-top {
+  display: flex;
+  align-items: center;
+  gap: var(--fp-space-2);
+  min-height: calc(56px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) max(var(--fp-space-3), env(safe-area-inset-right)) 0 max(var(--fp-space-2), env(safe-area-inset-left));
+  background: var(--pv-chrome);
+  border-block-end: 1px solid oklch(1 0 0 / 0.08);
+  z-index: 2;
+}
+.pv-heading { display: flex; align-items: baseline; gap: var(--fp-space-3); flex: 1; min-width: 0; }
+.pv-title { font-size: var(--fp-text-base); font-weight: var(--fp-weight-semibold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.pv-counter { color: var(--pv-muted); font-size: var(--fp-text-sm); white-space: nowrap; }
+.pv-tools, .pv-actions { display: flex; align-items: center; gap: 2px; }
+.pv-zoom { display: flex; align-items: center; gap: 2px; padding-inline-end: var(--fp-space-2); margin-inline-end: var(--fp-space-1); border-inline-end: 1px solid oklch(1 0 0 / 0.12); }
+.pv-fit { min-width: 44px; }
+@media (max-width: 639px) {
+  .pv-counter, .pv-zoom { display: none; }
+  /* Share, Download and Info stay on a phone (§13.5: saving or sharing what you are looking at is one tap
+     and keeps the preview open); only "Open in new tab" goes, which a phone browser has no room for.
+     4 x 44 px still fits at 320 px because .pv-heading/.pv-title are min-width: 0 + ellipsis. */
+  .pv-actions .pv-tab-btn { display: none; }
+}
+
+.pv-body { position: relative; flex: 1; min-height: 0; display: flex; }
+.pv-stage { position: relative; flex: 1; min-width: 0; display: grid; place-items: center; overflow: hidden; }
+.pv-stage[data-kind="text"], .pv-stage[data-kind="pdf"] { place-items: stretch; }
+
+.pv-nav {
+  position: absolute;
+  inset-block-start: 50%;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 72px;
+  margin-block-start: -36px;
+  border-radius: var(--fp-radius);
+  background: oklch(0.2 0.01 255 / 0.55);
+  color: var(--pv-fg);
+  opacity: 0.8;
+  transition: opacity var(--fp-dur-fast) var(--fp-ease), background-color var(--fp-dur-fast) var(--fp-ease);
+}
+.pv-nav:hover:not(:disabled) { opacity: 1; background: oklch(0.3 0.01 255 / 0.8); }
+.pv-nav:disabled { opacity: 0; pointer-events: none; }
+.pv-nav--prev { inset-inline-start: max(var(--fp-space-2), env(safe-area-inset-left)); }
+.pv-nav--next { inset-inline-end: max(var(--fp-space-2), env(safe-area-inset-right)); }
+/* Only beside the side panel: below 640 px the panel is a bottom sheet and Next keeps its place at the edge. */
+@media (min-width: 640px) {
+  .pv-body:has(.pv-info:not([hidden])) .pv-nav--next { inset-inline-end: calc(var(--pv-info-w) + var(--fp-space-2)); }
+}
+@media (pointer: coarse) {
+  .pv-nav { display: none; }
+}
+
+.pv-info {
+  width: var(--pv-info-w);
+  flex: none;
+  overflow-y: auto;
+  padding: var(--fp-space-5);
+  padding-inline-end: max(var(--fp-space-5), env(safe-area-inset-right)); /* clear of a landscape notch */
+  background: var(--pv-chrome);
+  border-inline-start: 1px solid oklch(1 0 0 / 0.08);
+  display: grid;
+  gap: var(--fp-space-4);
+  align-content: start;
+}
+.pv-info-title { font-size: var(--fp-text-md); }
+.pv-kv { grid-template-columns: minmax(90px, max-content) 1fr; }
+.pv-kv dt { color: var(--pv-muted); }
+@media (max-width: 639px) {
+  .pv-info { position: absolute; inset: auto 0 0 0; width: 100%; max-height: 60%; border-inline-start: 0; border-block-start: 1px solid oklch(1 0 0 / 0.12); border-radius: 16px 16px 0 0; z-index: 4; padding-inline-start: max(var(--fp-space-5), env(safe-area-inset-left)); padding-block-end: max(var(--fp-space-5), env(safe-area-inset-bottom)); }
+}
+
+/* ---- image */
+.pv-img-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  touch-action: none;
+  cursor: zoom-in;
+  padding: var(--fp-space-4);
+}
+.pv-img-stage[data-zoomed] { cursor: grab; }
+.pv-img-stage[data-panning] { cursor: grabbing; }
+.pv-img {
+  max-width: none;
+  transform-origin: center center;
+  user-select: none;
+  -webkit-user-drag: none;
+  will-change: transform;
+  box-shadow: 0 12px 48px oklch(0 0 0 / 0.45);
+  background: repeating-conic-gradient(oklch(0.3 0 0) 0 25%, oklch(0.36 0 0) 0 50%) 0 0 / 16px 16px;
+}
+.pv-img-stage:not([data-panning]) .pv-img { transition: transform 80ms linear; }
+.pv-img-stage[data-loading]::after {
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 3px solid oklch(1 0 0 / 0.2);
+  border-top-color: var(--pv-fg);
+  border-radius: 50%;
+  animation: fp-spin 0.75s linear infinite;
+}
+.pv-img-stage[data-loading] .pv-img { opacity: 0; }
+
+/* ---- video / audio */
+.pv-media { display: grid; place-items: center; width: 100%; height: 100%; padding: var(--fp-space-4); }
+.pv-video { max-width: 100%; max-height: 100%; width: auto; height: auto; border-radius: var(--fp-radius); background: #000; }
+.pv-audio-card { display: grid; justify-items: center; gap: var(--fp-space-3); width: min(460px, 100%); padding: var(--fp-space-7) var(--fp-space-5); border-radius: 24px; background: oklch(0.22 0.015 255); text-align: center; }
+.pv-audio-art { display: grid; place-items: center; width: 120px; height: 120px; border-radius: 28px; background: linear-gradient(135deg, oklch(0.55 0.15 300), oklch(0.6 0.14 250)); color: #fff; }
+.pv-audio-name { font-weight: var(--fp-weight-semibold); overflow-wrap: anywhere; }
+.pv-audio-meta { color: var(--pv-muted); font-size: var(--fp-text-sm); }
+.pv-audio { width: 100%; }
+
+/* ---- pdf */
+.pv-doc { width: 100%; height: 100%; }
+.pv-pdf { width: 100%; height: 100%; border: 0; background: oklch(0.3 0 0); }
+
+/* ---- text / code */
+.pv-text { position: relative; display: flex; flex-direction: column; width: 100%; height: 100%; min-height: 0; background: oklch(0.17 0.01 255); }
+/* The text viewer runs edge to edge, so its start and end paddings clear the side safe-area insets (landscape notch). */
+.pv-text-note { padding: var(--fp-space-2) max(var(--fp-space-4), env(safe-area-inset-right)) var(--fp-space-2) max(var(--fp-space-4), env(safe-area-inset-left)); background: oklch(0.3 0.06 80 / 0.5); color: oklch(0.92 0.06 85); font-size: var(--fp-text-sm); }
+.pv-text-scroll { flex: 1; min-height: 0; display: flex; align-items: flex-start; overflow: auto; overscroll-behavior: contain; }
+.pv-gutter, .pv-code {
+  margin: 0;
+  padding: var(--fp-space-4) var(--fp-space-3);
+  border: 0;
+  border-radius: 0;
+  background: none;
+  font-family: var(--fp-font-mono);
+  font-size: 13px;
+  line-height: 1.55;
+  tab-size: 4;
+  overflow: visible;
+}
+.pv-gutter {
+  position: sticky;
+  inset-inline-start: 0;
+  padding-inline-start: max(var(--fp-space-3), env(safe-area-inset-left));
+  min-width: calc(var(--pv-gutter-ch, 4) * 1ch + var(--fp-space-3) + max(var(--fp-space-3), env(safe-area-inset-left)));
+  text-align: end;
+  color: oklch(0.55 0.01 255);
+  background: oklch(0.17 0.01 255);
+  border-inline-end: 1px solid oklch(1 0 0 / 0.08);
+  user-select: none;
+  -webkit-user-select: none;
+}
+.pv-code { flex: 1; color: oklch(0.92 0.01 255); white-space: pre; outline: none; padding-inline-end: max(var(--fp-space-3), env(safe-area-inset-right)); }
+.pv-text[data-wrap] .pv-code { white-space: pre-wrap; overflow-wrap: anywhere; padding-inline-start: max(var(--fp-space-3), env(safe-area-inset-left)); }
+.pv-text[data-wrap] .pv-gutter { display: none; }
+.pv-text-spinner { display: none; position: absolute; inset: 0; place-items: center; }
+.pv-text[data-loading] .pv-text-spinner { display: grid; }
+.pv-text[data-loading] .pv-text-scroll { visibility: hidden; }
+
+/* ---- fallback card */
+.pv-fallback {
+  display: grid;
+  justify-items: center;
+  place-self: center; /* never inherit the stretch the pdf/text renderers ask of the stage */
+  gap: var(--fp-space-3);
+  width: min(460px, calc(100% - 32px));
+  padding: var(--fp-space-7) var(--fp-space-5);
+  border-radius: 24px;
+  background: oklch(0.22 0.015 255);
+  text-align: center;
+}
+.pv-fallback-icon { display: grid; place-items: center; width: 96px; height: 96px; border-radius: 24px; background: oklch(1 0 0 / 0.06); color: var(--pv-muted); }
+.pv-fallback-name { font-size: var(--fp-text-md); font-weight: var(--fp-weight-semibold); overflow-wrap: anywhere; }
+.pv-fallback-meta, .pv-fallback-text { color: var(--pv-muted); font-size: var(--fp-text-sm); }
+.pv-fallback-actions { justify-content: center; }
+.pv .btn--secondary { --btn-bg: oklch(1 0 0 / 0.06); --btn-fg: var(--pv-fg); --btn-border: oklch(1 0 0 / 0.16); --btn-bg-hover: oklch(1 0 0 / 0.12); }

@@ -1,0 +1,7 @@
+{
+  "mode": "app",
+  "port": 8443,
+  "allow_admin": false,
+  "require_2fa": true,
+  "confirm": "public"
+}
