@@ -806,8 +806,15 @@ func checkFirewall(ctx context.Context, d *app.Deps) []DoctorCheck {
 	if in.BuiltinMDNS {
 		need += " (and UDP port 5353 for the .local name)"
 	}
+	// devices from every network have connected lately: the firewall evidently lets them in
+	in, allSeen := firewallUnseen(ctx, d, in)
 	var out []DoctorCheck
 	for _, fw := range active {
+		if allSeen {
+			out = append(out, DoctorCheck{ID: "firewall." + fw.Kind, Name: "Host firewall (" + fw.Kind + ")", Status: CheckOK, Link: "/admin/network",
+				Message: fmt.Sprintf("%s is active and devices from all your networks have connected lately", fw.Kind)})
+			continue
+		}
 		c := DoctorCheck{ID: "firewall." + fw.Kind, Name: "Host firewall (" + fw.Kind + ")", Status: CheckInfo, Link: "/admin/network",
 			Message: fmt.Sprintf("%s is active: other devices can only connect if it allows %s", fw.Kind, need)}
 		if cmds := svc.Hints(fw.Kind, in); len(cmds) > 0 {
