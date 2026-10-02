@@ -102,3 +102,8 @@ sh scripts/gen-settings-docs.sh     # the settings reference in docs/FILEPARCEL.
 A `Signed-off-by` line is **not** required, and there is no contributor license agreement. By sending a
 contribution you agree that it is licensed under the project's [Apache License 2.0](LICENSE), as section 5
 of that license describes.
+
+## Supporting the project
+
+FileParcel is a spare-time project. Besides code, bug reports and ideas, you can support it with a
+[coffee](https://buymeacoffee.com/kpdirectmail) — thank you!

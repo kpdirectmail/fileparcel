@@ -2,6 +2,8 @@
 
 **Self-hosted, encrypted file sharing for your home or small office — one program, one folder.**
 
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-support%20FileParcel-FFDD00?logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/kpdirectmail)
+
 [Download](https://github.com/kpdirectmail/fileparcel/releases/latest) ·
 [Install guide](docs/INSTALL.md) · [User manual](docs/FILEPARCEL.md) · [Commands](docs/COMMANDS.md) ·
 [Report a bug](https://github.com/kpdirectmail/fileparcel/issues/new/choose) ·
@@ -166,6 +168,12 @@ More in [Development](docs/DEVELOPMENT.md) and [Contributing](CONTRIBUTING.md).
 - **Security issues: report privately**, never in a public issue:
   [report a vulnerability](https://github.com/kpdirectmail/fileparcel/security/advisories/new). See
   [Reporting a vulnerability](docs/SECURITY.md#reporting-a-vulnerability) for what to include.
+
+## Support FileParcel
+
+FileParcel is free and open source, built in my spare time. If it's useful to you, you can
+[buy me a coffee](https://buymeacoffee.com/kpdirectmail) ☕ — it helps me keep fixing bugs and adding
+features. Reporting bugs, suggesting ideas and sharing the project help just as much.
 
 ## License
 
